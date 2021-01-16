@@ -203,6 +203,7 @@ export default {
     addAnswer() {
       const answer = document.getElementById('new-answer').value
       this.socket.emit('addAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, answer: answer})
+      document.getElementById('new-answer').value = ''
     },
     makeAnswer(answerId) {
       this.socket.emit('makeAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, answerId: answerId})

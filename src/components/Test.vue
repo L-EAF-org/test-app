@@ -26,7 +26,8 @@
           </tr>
           <tr v-for="(answer, aindex) in question.answers" :key="aindex" class="answer">
             <td>
-              <input type="checkbox">
+              <input v-if="!question.multiple" type="radio" :name="'question-' + question.id">
+              <input v-if="question.multiple" type="checkbox">
             </td>
             <td>
               {{ answer.value }}
