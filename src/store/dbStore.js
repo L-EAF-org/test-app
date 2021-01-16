@@ -93,20 +93,21 @@ module.exports = {
 
     if (debugOn) { console.log('loadTest', data) }
 
-    db.collection('leafTestSections').find({test: data.test}).toArray(function(err, res) {
+    db.collection('leafTestSections').find({testId: data.id}).toArray(function(err, res) {
       if (err) throw err
       if (res.length) {
         const sections = []
         for (let r = 0; r < res.length; r++) {
-          sections.push({section: res[r].section, questions: []})
+          sections.push({id: res[r].id, section: res[r].section, questions: []})
         }
-        db.collection('leafTestQuestions').find({test: data.test}).toArray(function(err, secRes) {
+        console.log(sections)
+        db.collection('leafTestQuestions').find({testId: data.id}).toArray(function(err, secRes) {
           if (err) throw err
           if (secRes.length) {
             for (let i = 0; i < secRes.length; i++) {
               for (let j = 0; j < sections.length; j++) {
-                if (secRes[i].section == sections[j].section) {
-                  sections[j].questions.push(secRes[i].question)
+                if (secRes[i].sectionId == sections[j].id) {
+                  sections[j].questions.push(secRes[i])
                 }
               }
             }

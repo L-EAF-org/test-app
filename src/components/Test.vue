@@ -6,7 +6,7 @@
         <option value="">
           -- Select --
         </option>
-        <option v-for="(t, index) in tests" :key="index">
+        <option v-for="(t, index) in tests" :key="index" :value="t.id">
           {{ t.test }}
         </option>
       </select>
@@ -60,8 +60,8 @@ export default {
   },
   methods: {
     loadTest() {
-      const test = document.getElementById('test').value
-      this.socket.emit('loadTest', {test: test})
+      const id = document.getElementById('test-select').value
+      this.socket.emit('loadTest', {id: id})
     }
   }
 }

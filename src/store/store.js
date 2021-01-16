@@ -48,6 +48,7 @@ export const store = new Vuex.Store({
       state.showFacilitator = payload
     },
     loadTest: (state, payload) => {
+      console.log(payload)
       state.test = payload
     },
     loadTests: (state, payload) => {
