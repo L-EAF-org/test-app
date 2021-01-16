@@ -67,7 +67,7 @@ export default {
       return this.$store.getters.getShowFacilitator
     },
     thisGame() {
-      return this.$store.getters.thisGame
+      return this.$store.getters.getThisGame
     }
   },
   methods: {
