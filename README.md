@@ -15,7 +15,8 @@ https://zellwk.com/blog/install-mongodb/
 
 ## Run Mongo
 
-```mongod --config /usr/local/etc/mongod.conf
+```
+mongod --config /usr/local/etc/mongod.conf
 ```
 
 # Run the app
