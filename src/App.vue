@@ -4,7 +4,8 @@
     <div class="container">
       <h1>L-EAF.org Test Centre</h1>
       <div v-if="showFacilitator">
-        <Config :socket="socket" />
+        <Tests :socket="socket" />
+        <Sections :socket="socket" />
         <Questions :socket="socket" />
       </div>
       <div v-if="!showFacilitator">
@@ -21,7 +22,8 @@ import params from './lib/params.js'
 
 import Header from './components/Header.vue'
 import Test from './components/Test.vue'
-import Config from './components/Config.vue'
+import Tests from './components/Tests.vue'
+import Sections from './components/Sections.vue'
 import Questions from './components/Questions.vue'
 
 export default {
@@ -29,7 +31,8 @@ export default {
   components: {
     Header,
     Test,
-    Config,
+    Tests,
+    Sections,
     Questions
   },
   computed: {
@@ -53,6 +56,8 @@ export default {
     if (params.isParam('host')) {
       this.$store.dispatch('updateHost', true)
     }
+
+    this.socket.emit('loadTests')
   },
   methods: {
   }
@@ -60,7 +65,7 @@ export default {
 </script>
 
 <style lang="scss">
-.config-test-config, .config-test-questions {
+.config-test-tests, .config-test-sections, .config-test-questions {
   width: 100%;
   margin: 12px;
   border: 1px solid #ccc;
@@ -94,7 +99,6 @@ export default {
     position: relative;
     padding: 4px;
     text-align: left;
-    border: 1px solid #ccc;
 
     &.center {
       text-align: center;
@@ -106,12 +110,22 @@ export default {
       color: #888;
       font-size: x-large;
       margin: 4px;
+
+      &:hover {
+        cursor: pointer;
+        color: #444;
+      }
     }
   }
+
   input {
     height: 24px;
     padding: 2px;
     margin: 0 auto;
+  }
+
+  button {
+    margin-left: 4px;
   }
 }
 </style>

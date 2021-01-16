@@ -1,10 +1,34 @@
 <template>
   <div class="test-questions">
-    <div v-for="(question, index) in questions" :key="index">
-      <div class="question">
-        <h5>{{ question.question }}?</h5>
+    <div>
+      Test:
+      <select id="test-select" @change="loadTest()">
+        <option value="">
+          -- Select --
+        </option>
+        <option v-for="(t, index) in tests" :key="index">
+          {{ t.test }}
+        </option>
+      </select>
+    </div>
+    <h2>{{ test.test }}</h2>
+    <div v-for="(section, sindex) in test.sections" :key="sindex">
+      <h3>{{ section.section }}</h3>
+      <div v-for="(question, qindex) in section.questions" :key="qindex">
+        <div class="question">
+          <h5>{{ question.question }}?</h5>
+        </div>
+        <table class="answers">
+          <tr v-for="(answer, aindex) in question.answers" :key="aindex" class="answer">
+            <td>
+              <input type="checkbox">
+            </td>
+            <td>
+              {{ answer.value }}
+            </td>
+          </tr>
+        </table>
       </div>
-      <div class="answers" />
     </div>
   </div>
 </template>
@@ -15,20 +39,46 @@ export default {
     'socket'
   ],
   computed: {
+    test() {
+      return this.$store.getters.getTest
+    },
+    tests() {
+      return this.$store.getters.getTests
+    },
     questions() {
       return this.$store.getters.getQuestions
     }
   },
+  created() {
+    this.socket.on('loadTests', (data) => {
+      this.$store.dispatch('loadTests', data)
+    })
+
+    this.socket.on('loadTest', (data) => {
+      this.$store.dispatch('loadTest', data)
+    })
+  },
   methods: {
+    loadTest() {
+      const test = document.getElementById('test').value
+      this.socket.emit('loadTest', {test: test})
+    }
   }
 }
 </script>
 
 <style lang="scss">
   .test-questions {
-    h5 {
-      width: 100%;
+    h3 {
       text-align: left;
+    }
+    h5 {
+      margin-left: 24px;
+      text-align: left;
+    }
+    .answers {
+      text-align: left;
+      margin-left: 48px;
     }
   }
 </style>

@@ -57,6 +57,10 @@ function doDb(fun, data) {
     const db = client.db('db')
 
     switch(fun) {
+      case 'loadTest':
+        dbStore.loadTest(db, io, data, debugOn)
+        break
+
       case 'loadTests':
         dbStore.loadTests(db, io, debugOn)
         break
@@ -70,17 +74,53 @@ function doDb(fun, data) {
       case 'addTest':
         dbStore.addTest(db, io, data, debugOn)
         break
+      case 'updateTest':
+        dbStore.updateTest(db, io, data, debugOn)
+        break
+      case 'deleteTest':
+          dbStore.deleteTest(db, io, data, debugOn)
+          break
       case 'addSection':
         dbStore.addSection(db, io, data, debugOn)
         break
+      case 'updateSection':
+        dbStore.updateSection(db, io, data, debugOn)
+        break
+      case 'deleteSection':
+        dbStore.deleteSection(db, io, data, debugOn)
+        break
+      case 'moveSectionUp':
+        dbStore.moveSectionUp(db, io, data, debugOn)
+        break
+      case 'moveSectionDown':
+        dbStore.moveSectionDown(db, io, data, debugOn)
+        break
       case 'addQuestion':
         dbStore.addQuestion(db, io, data, debugOn)
+        break
+      case 'deleteQuestion':
+        dbStore.deleteQuestion(db, io, data, debugOn)
+        break
+      case 'moveQuestionUp':
+        dbStore.moveQuestionUp(db, io, data, debugOn)
+        break
+      case 'moveQuestionDown':
+        dbStore.moveQuestionDown(db, io, data, debugOn)
         break
       case 'addAnswer':
         dbStore.addAnswer(db, io, data, debugOn)
         break
       case 'makeAnswer':
         dbStore.makeAnswer(db, io, data, debugOn)
+        break
+      case 'deleteAnswer':
+        dbStore.deleteAnswer(db, io, data, debugOn)
+        break
+      case 'moveAnswerUp':
+        dbStore.moveAnswerUp(db, io, data, debugOn)
+        break
+      case 'moveAnswerDown':
+        dbStore.moveAnswerDown(db, io, data, debugOn)
         break
       case 'saveQuestionType':
         dbStore.saveQuestionType(db, io, data, debugOn)
@@ -107,6 +147,12 @@ io.on('connection', (socket) => {
     emit('updateConnections', {connections: connections, maxConnections: maxConnections})
   })
 
+  // Test
+
+  socket.on('loadTest', (data) => { doDb('loadTest', data) })
+
+  // Facilitator
+
   socket.on('loadTests', () => { doDb('loadTests') })
 
   socket.on('loadSections', (data) => { doDb('loadSections', data) })
@@ -115,13 +161,37 @@ io.on('connection', (socket) => {
 
   socket.on('addTest', (data) => { doDb('addTest', data) })
 
+  socket.on('updateTest', (data) => { doDb('updateTest', data) })
+
+  socket.on('deleteTest', (data) => { doDb('deleteTest', data) })
+
   socket.on('addSection', (data) => { doDb('addSection', data) })
 
+  socket.on('updateSection', (data) => { doDb('updateSection', data) })
+
+  socket.on('deleteSection', (data) => { doDb('deleteSection', data) })
+
+  socket.on('moveSectionUp', (data) => { doDb('moveSectionUp', data) })
+
+  socket.on('moveSectionDown', (data) => { doDb('moveSectionDown', data) })
+
   socket.on('addQuestion', (data) => { doDb('addQuestion', data) })
+
+  socket.on('deleteQuestion', (data) => { doDb('deleteQuestion', data) })
+
+  socket.on('moveQuestionUp', (data) => { doDb('moveQuestionUp', data) })
+
+  socket.on('moveQuestionDown', (data) => { doDb('moveQuestionDown', data) })
 
   socket.on('addAnswer', (data) => { doDb('addAnswer', data) })
 
   socket.on('makeAnswer', (data) => { doDb('makeAnswer', data) })
+
+  socket.on('deleteAnswer', (data) => { doDb('deleteAnswer', data) })
+
+  socket.on('moveAnswerUp', (data) => { doDb('moveAnswerUp', data) })
+
+  socket.on('moveAnswerDown', (data) => { doDb('moveAnswerDown', data) })
 
   socket.on('saveQuestionType', (data) => { doDb('saveQuestionType', data) })
 

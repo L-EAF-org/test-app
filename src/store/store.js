@@ -8,6 +8,7 @@ export const store = new Vuex.Store({
     host: false,
     showFacilitator: false,
     thisGame: 'L-EAF.org Test App',
+    test: [],
     tests: [],
     sections: [],
     questions: []
@@ -22,14 +23,21 @@ export const store = new Vuex.Store({
     getThisGame: (state) => {
       return state.thisGame
     },
+    getTest: (state) => {
+      return state.test
+    },
     getTests: (state) => {
       return state.tests
     },
     getSections: (state) => {
-      return state.sections
+      return state.sections.sort(function(a, b) {
+        return a.order - b.order
+      })
     },
     getQuestions: (state) => {
-      return state.questions
+      return state.questions.sort(function(a, b) {
+        return a.order - b.order
+      })
     }
   },
   mutations: {
@@ -38,6 +46,9 @@ export const store = new Vuex.Store({
     },
     updateShowFacilitator: (state, payload) => {
       state.showFacilitator = payload
+    },
+    loadTest: (state, payload) => {
+      state.test = payload
     },
     loadTests: (state, payload) => {
       state.tests = payload
@@ -48,7 +59,11 @@ export const store = new Vuex.Store({
     loadQuestions: (state, payload) => {
       const questions = []
       for (let i = 0; i < payload.length; i++) {
-        questions.push(payload[i].question)
+        const question = payload[i]
+        question.answers = payload[i].answers.sort(function(a, b) {
+          return a.order - b.order
+        })
+        questions.push(question)
       }
       state.questions = questions
     }
@@ -59,6 +74,9 @@ export const store = new Vuex.Store({
     },
     updateShowFacilitator: ({ commit }, payload) => {
       commit('updateShowFacilitator', payload)
+    },
+    loadTest: ({ commit }, payload) => {
+      commit('loadTest', payload)
     },
     loadTests: ({ commit }, payload) => {
       commit('loadTests', payload)

@@ -16,17 +16,13 @@
             </td>
             <td>
               <select id="test" class="question-select" @change="loadSections()">
-                <option> -- Select -- </option>
-                <option v-for="(test, tindex) in tests" :key="tindex">
+                <option value="">
+                  -- Select --
+                </option>
+                <option v-for="(test, tindex) in tests" :key="tindex" :value="test.id">
                   {{ test.test }}
                 </option>
               </select>
-            </td>
-            <td>
-              New: <input type="text" class="new-test" id="new-test">
-              <button class="btn btn-sm btn-site-primary" @click="addTest()">
-                Add
-              </button>
             </td>
           </tr>
           <tr>
@@ -35,17 +31,13 @@
             </td>
             <td>
               <select id="section" class="question-select" @change="loadQuestions()">
-                <option> -- Select -- </option>
-                <option v-for="(section, sindex) in sections" :key="sindex">
+                <option value="">
+                  -- Select --
+                </option>
+                <option v-for="(section, sindex) in sections" :key="sindex" :value="section.id">
                   {{ section.section }}
                 </option>
               </select>
-            </td>
-            <td>
-              New: <input type="text" class="new-test" id="new-section">
-              <button class="btn btn-sm btn-site-primary" @click="addSection()">
-                Add
-              </button>
             </td>
           </tr>
         </table>
@@ -66,8 +58,12 @@
           </tr>
           <tr v-for="(question, index) in questions" :key="index" class="question">
             <td class="header">
+              <i title="Delete" class="fas fa-trash-alt" @click="deleteQuestion(question.id)" />
+
               <i v-if="currentQuestionId == question.id" @click="saveQuestion()" title="save" class="fas fa-save" />
               <i v-if="currentQuestionId != question.id" @click="editQuestion(question)" title="edit" class="fas fa-edit" />
+              <i v-if="index > 0" title="Move Up" class="fas fa-chevron-up" @click="moveUp(question.id, question.order)" />
+              <i v-if="index < questions.length - 1" title="Move Down" class="fas fa-chevron-down" @click="moveDown(question.id, question.order)" />
             </td>
             <td>
               <div v-if="currentQuestionId != question.id" class="question-text">
@@ -80,9 +76,11 @@
                 <div class="answer-type">
                   Answer Type:
                   <input :name="'question-type-' + question.id" :id="'question-type-single-' + question.id" type="radio"
-                         :checked="!question.multiple" @click="saveQuestionType()"> Choose one answer
+                         :checked="!question.multiple" @click="saveQuestionType()"
+                  > Choose one answer
                   <input :name="'question-type-' + question.id" :id="'question-type-multiple-' + question.id" type="radio"
-                         :checked="question.multiple" @click="saveQuestionType()"> Select all that apply
+                         :checked="question.multiple" @click="saveQuestionType()"
+                  > Select all that apply
                 </div>
                 <table class="answers">
                   <tr>
@@ -98,9 +96,9 @@
                   </tr>
                   <tr v-for="(answer, aindex) in question.answers" :key="aindex">
                     <td>
-                      <i title="Delete" class="fas fa-trash-alt" @click="deleteAnswer(question.id, answer.id)" />
-                      <i v-if="aindex > 0" title="Move Up" class="fas fa-chevron-up" @click="moveAnswerUp(question.id, answer.id)" />
-                      <i v-if="aindex < question.answers.length - 1" title="Move Down" class="fas fa-chevron-down" @click="moveAnswerDown(question.id, answer.id)" />
+                      <i title="Delete" class="fas fa-trash-alt" @click="deleteAnswer(answer.id)" />
+                      <i v-if="aindex > 0" title="Move Up" class="fas fa-chevron-up" @click="moveAnswerUp(answer.id, answer.order)" />
+                      <i v-if="aindex < question.answers.length - 1" title="Move Down" class="fas fa-chevron-down" @click="moveAnswerDown(answer.id, answer.order)" />
                     </td>
                     <td>
                       <input type="checkbox" :checked="answer.answer" @click="makeAnswer(answer.id)">
@@ -163,8 +161,6 @@ export default {
     this.socket.on('loadQuestions', (data) => {
       this.$store.dispatch('loadQuestions', data)
     })
-
-    this.socket.emit('loadTests')
   },
   methods: {
     setShowTestQuestions(val) {
@@ -173,41 +169,52 @@ export default {
     editQuestion(question) {
       this.currentQuestionId = question.id
     },
-    addTest() {
-      const test = document.getElementById('new-test').value
-      this.socket.emit('addTest', {test: test})
-    },
     loadSections() {
       this.currentTest = document.getElementById('test').value
-      this.socket.emit('loadSections', {test: this.currentTest})
-    },
-    addSection() {
-      const section = document.getElementById('new-section').value
-      this.socket.emit('addSection', {test: this.currentTest, section: section})
+      this.socket.emit('loadSections', {testId: this.currentTest})
     },
     loadQuestions() {
       this.currentSection = document.getElementById('section').value
-      this.socket.emit('loadQuestions', {test: this.currentTest, section: this.currentSection})
+      this.socket.emit('loadQuestions', {testId: this.currentTest, sectionId: this.currentSection})
     },
     addQuestion() {
       const question = document.getElementById('new-question').value
-      this.socket.emit('addQuestion', {test: this.currentTest, section: this.currentSection, question: question})
+      this.socket.emit('addQuestion', {testId: this.currentTest, sectionId: this.currentSection, question: question})
+      document.getElementById('new-question').value = ''
+    },
+    deleteQuestion(id) {
+      this.socket.emit('deleteQuestion', {testId: this.currentTest, sectionId: this.currentSection, id: id})
+    },
+    moveUp(id, order) {
+      this.socket.emit('moveQuestionUp', {testId: this.currentTest, sectionId: this.currentSection, questionId: id, order: order})
+    },
+    moveDown(id, order) {
+      this.socket.emit('moveQuestionDown', {testId: this.currentTest, sectionId: this.currentSection, questionId: id, order: order})
     },
     saveQuestionType() {
       const multiple = document.getElementById('question-type-multiple-' + this.currentQuestionId).checked
-      this.socket.emit('saveQuestionType', {test: this.currentTest, section: this.currentSection, questionId: this.currentQuestionId, multiple: multiple})
+      this.socket.emit('saveQuestionType', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, multiple: multiple})
     },
     saveQuestion() {
       const question = document.getElementById('question-' + this.currentQuestionId).value
-      this.socket.emit('saveQuestionQuestion', {test: this.currentTest, section: this.currentSection, questionId: this.currentQuestionId, question: question})
+      this.socket.emit('saveQuestionQuestion', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, question: question})
       this.currentQuestionId = ''
     },
     addAnswer() {
       const answer = document.getElementById('new-answer').value
-      this.socket.emit('addAnswer', {test: this.currentTest, section: this.currentSection, questionId: this.currentQuestionId, answer: answer})
+      this.socket.emit('addAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, answer: answer})
     },
     makeAnswer(answerId) {
-      this.socket.emit('makeAnswer', {test: this.currentTest, section: this.currentSection, questionId: this.currentQuestionId, answerId: answerId})
+      this.socket.emit('makeAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, answerId: answerId})
+    },
+    moveAnswerUp(id, order) {
+      this.socket.emit('moveAnswerUp', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id, order: order})
+    },
+    moveAnswerDown(id, order) {
+      this.socket.emit('moveAnswerDown', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id, order: order})
+    },
+    deleteAnswer(id) {
+      this.socket.emit('deleteAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id})
     }
   }
 }
@@ -216,16 +223,8 @@ export default {
 <style lang="scss">
   .config-test-questions {
 
-    button {
-      margin-left: 4px;
-    }
-
     .question-select {
       width: 200px;
-    }
-
-    .new-test {
-      width: 200px !important;
     }
 
     .question-text {
