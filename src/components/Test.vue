@@ -19,6 +19,11 @@
           <h5>{{ question.question }}?</h5>
         </div>
         <table class="answers">
+          <tr v-if="question.multiple">
+            <td colspan="2">
+              <i>Tick all that apply</i>
+            </td>
+          </tr>
           <tr v-for="(answer, aindex) in question.answers" :key="aindex" class="answer">
             <td>
               <input type="checkbox">
