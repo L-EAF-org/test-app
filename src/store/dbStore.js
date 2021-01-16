@@ -100,12 +100,10 @@ module.exports = {
         for (let r = 0; r < res.length; r++) {
           sections.push({id: res[r].id, section: res[r].section, questions: []})
         }
-        console.log(sections)
         db.collection('leafTestQuestions').find({testId: data.id}).toArray(function(err, secRes) {
           if (err) throw err
           if (secRes.length) {
             for (let i = 0; i < secRes.length; i++) {
-              console.log(secRes[i])
               for (let j = 0; j < sections.length; j++) {
                 if (secRes[i].sectionId == sections[j].id) {
                   sections[j].questions.push(secRes[i])
