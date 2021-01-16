@@ -93,7 +93,7 @@ module.exports = {
 
     if (debugOn) { console.log('addAnswer', data) }
 
-    db.collection('leafTestQuestions').findOne({test: data.test, section: data.section, 'question.id': data.questionId}, function(err, res) {
+    db.collection('leafTestQuestions').findOne({test: data.test, section: data.section, "question.id": data.questionId}, function(err, res) {
       if (err) throw err
       if (res) {
         const order = res.question.answers.length + 1
@@ -119,7 +119,7 @@ module.exports = {
 
     if (debugOn) { console.log('makeAnswer', data) }
 
-    db.collection('leafTestQuestions').findOne({test: data.test, section: data.section, 'question.id': data.questionId}, function(err, res) {
+    db.collection('leafTestQuestions').findOne({test: data.test, section: data.section, "question.id": data.questionId}, function(err, res) {
       if (err) throw err
       if (res) {
         const answers = []
@@ -150,7 +150,7 @@ module.exports = {
 
     if (debugOn) { console.log('saveQuestionType', data) }
 
-    db.collection('leafTestQuestions').findOne({test: data.test, section: data.section, 'question.id': data.questionId}, function(err, res) {
+    db.collection('leafTestQuestions').findOne({test: data.test, section: data.section, "question.id": data.questionId}, function(err, res) {
       if (err) throw err
       if (res) {
         res.question.multiple = data.multiple
@@ -170,7 +170,7 @@ module.exports = {
 
     if (debugOn) { console.log('saveQuestionQuestion', data) }
 
-    db.collection('leafTestQuestions').findOne({test: data.test, section: data.section, 'question.id': data.questionId}, function(err, res) {
+    db.collection('leafTestQuestions').findOne({test: data.test, section: data.section, "question.id": data.questionId}, function(err, res) {
       if (err) throw err
       if (res) {
         res.question.question = data.question
