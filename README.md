@@ -1,10 +1,6 @@
 
 # L-EAF.org Test app
 
-An online, real-time, multiplayer version of the No Estimates game. See
-<a href="https://noestimates.wordpress.com/">No Estimates</a> for detailed
-descriptions of the game and how to play.
-
 ## Project setup
 
 ```
