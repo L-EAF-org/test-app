@@ -7,6 +7,7 @@ export const store = new Vuex.Store({
   state: {
     host: false,
     showFacilitator: false,
+    thisGame: 'L-EAF.org Test App',
     tests: [],
     sections: [],
     questions: []
@@ -17,6 +18,9 @@ export const store = new Vuex.Store({
     },
     getShowFacilitator: (state) => {
       return state.showFacilitator
+    },
+    getThisGame: (state) => {
+      return state.thisGame
     },
     getTests: (state) => {
       return state.tests

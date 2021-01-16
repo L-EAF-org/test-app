@@ -37,7 +37,7 @@
         <div class="mt-4">
           <h4>Feedback</h4>
           <p class="feedback-form">
-            Thanks for visiting Agile Simulation Labs; we'd love to hear any feedback you have
+            Thanks for using {{ thisGame }}; we'd love to hear any feedback you have
             so that we can constantly improve things.
           </p>
           <div class="feedback-form">
@@ -65,6 +65,9 @@ export default {
     },
     showFacilitator() {
       return this.$store.getters.getShowFacilitator
+    },
+    thisGame() {
+      return this.$store.getters.thisGame
     }
   },
   methods: {
