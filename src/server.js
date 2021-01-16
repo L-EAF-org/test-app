@@ -76,6 +76,18 @@ function doDb(fun, data) {
       case 'addQuestion':
         dbStore.addQuestion(db, io, data, debugOn)
         break
+      case 'addAnswer':
+        dbStore.addAnswer(db, io, data, debugOn)
+        break
+      case 'makeAnswer':
+        dbStore.makeAnswer(db, io, data, debugOn)
+        break
+      case 'saveQuestionType':
+        dbStore.saveQuestionType(db, io, data, debugOn)
+        break
+      case 'saveQuestionQuestion':
+        dbStore.saveQuestionQuestion(db, io, data, debugOn)
+        break
     }
   })
 }
@@ -106,6 +118,14 @@ io.on('connection', (socket) => {
   socket.on('addSection', (data) => { doDb('addSection', data) })
 
   socket.on('addQuestion', (data) => { doDb('addQuestion', data) })
+
+  socket.on('addAnswer', (data) => { doDb('addAnswer', data) })
+
+  socket.on('makeAnswer', (data) => { doDb('makeAnswer', data) })
+
+  socket.on('saveQuestionType', (data) => { doDb('saveQuestionType', data) })
+
+  socket.on('saveQuestionQuestion', (data) => { doDb('saveQuestionQuestion', data) })
 
 })
 

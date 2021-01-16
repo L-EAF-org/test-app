@@ -42,7 +42,7 @@
               </select>
             </td>
             <td>
-              New: <input type="text"  class="new-test" id="new-section">
+              New: <input type="text" class="new-test" id="new-section">
               <button class="btn btn-sm btn-site-primary" @click="addSection()">
                 Add
               </button>
@@ -56,7 +56,9 @@
         <table>
           <tr class="question">
             <td class="header">
-              <i @click="addQuestion()" title="save" class="fas fa-save" />
+              <button class="btn btn-sm btn-site-primary" @click="addQuestion()">
+                Add New
+              </button>
             </td>
             <td>
               <input id="new-question" type="text" class="question-text">
@@ -64,7 +66,7 @@
           </tr>
           <tr v-for="(question, index) in questions" :key="index" class="question">
             <td class="header">
-              <i v-if="currentQuestionId == question.id" @click="saveQuestion(question)" title="save" class="fas fa-save" />
+              <i v-if="currentQuestionId == question.id" @click="saveQuestion()" title="save" class="fas fa-save" />
               <i v-if="currentQuestionId != question.id" @click="editQuestion(question)" title="edit" class="fas fa-edit" />
             </td>
             <td>
@@ -77,8 +79,10 @@
                 </div>
                 <div class="answer-type">
                   Answer Type:
-                  <input :name="'question-type-' + question.id" :id="'question-type-single-' + question.id" type="radio" :checked="!question.multiple"> Choose one answer
-                  <input :name="'question-type-' + question.id" :id="'question-type-multiple' + question.id" type="radio" :checked="question.multiple"> Select all that apply
+                  <input :name="'question-type-' + question.id" :id="'question-type-single-' + question.id" type="radio"
+                         :checked="!question.multiple" @click="saveQuestionType()"> Choose one answer
+                  <input :name="'question-type-' + question.id" :id="'question-type-multiple-' + question.id" type="radio"
+                         :checked="question.multiple" @click="saveQuestionType()"> Select all that apply
                 </div>
                 <table class="answers">
                   <tr>
@@ -99,7 +103,7 @@
                       <i v-if="aindex < question.answers.length - 1" title="Move Down" class="fas fa-chevron-down" @click="moveAnswerDown(question.id, answer.id)" />
                     </td>
                     <td>
-                      <input type="checkbox" :checked="answer.answer">
+                      <input type="checkbox" :checked="answer.answer" @click="makeAnswer(answer.id)">
                     </td>
                     <td>
                       <input type="text" :value="answer.value">
@@ -107,7 +111,7 @@
                   </tr>
                   <tr>
                     <td colspan="3">
-                      New Answer: <input id="new-answer" type="text" @click="addNewAnswer(question.id)">
+                      New Answer: <input id="new-answer" type="text">
                       <button class="btn btn-sm btn-site-primary" @click="addAnswer()">
                         Add
                       </button>
@@ -131,7 +135,9 @@ export default {
   data() {
     return {
       showTestQuestions: false,
-      currentQuestionId: null
+      currentQuestionId: null,
+      currentTest: '',
+      currentSection: ''
     }
   },
   computed: {
@@ -172,33 +178,36 @@ export default {
       this.socket.emit('addTest', {test: test})
     },
     loadSections() {
-      const test = document.getElementById('test').value
-      this.socket.emit('loadSections', {test: test})
+      this.currentTest = document.getElementById('test').value
+      this.socket.emit('loadSections', {test: this.currentTest})
     },
     addSection() {
-      const test = document.getElementById('test').value
       const section = document.getElementById('new-section').value
-      this.socket.emit('addSection', {test: test, section: section})
+      this.socket.emit('addSection', {test: this.currentTest, section: section})
     },
     loadQuestions() {
-      const test = document.getElementById('test').value
-      const section = document.getElementById('section').value
-      this.socket.emit('loadQuestions', {test: test, section: section})
+      this.currentSection = document.getElementById('section').value
+      this.socket.emit('loadQuestions', {test: this.currentTest, section: this.currentSection})
     },
     addQuestion() {
-      const test = document.getElementById('test').value
-      const section = document.getElementById('section').value
       const question = document.getElementById('new-question').value
-      this.socket.emit('addQuestion', {test: test, section: section, question: question})
+      this.socket.emit('addQuestion', {test: this.currentTest, section: this.currentSection, question: question})
     },
-    saveQuestionType(question) {
-      question.multiple = document.getElementById('question-type-multiple-' + question.id).checked
-      this.socket.emit('saveQuestion', question)
+    saveQuestionType() {
+      const multiple = document.getElementById('question-type-multiple-' + this.currentQuestionId).checked
+      this.socket.emit('saveQuestionType', {test: this.currentTest, section: this.currentSection, questionId: this.currentQuestionId, multiple: multiple})
     },
-    saveQuestion(question) {
-      question.question = document.getElementById('question-' + question.id).value
-      this.socket.emit('saveQuestion', question)
+    saveQuestion() {
+      const question = document.getElementById('question-' + this.currentQuestionId).value
+      this.socket.emit('saveQuestionQuestion', {test: this.currentTest, section: this.currentSection, questionId: this.currentQuestionId, question: question})
       this.currentQuestionId = ''
+    },
+    addAnswer() {
+      const answer = document.getElementById('new-answer').value
+      this.socket.emit('addAnswer', {test: this.currentTest, section: this.currentSection, questionId: this.currentQuestionId, answer: answer})
+    },
+    makeAnswer(answerId) {
+      this.socket.emit('makeAnswer', {test: this.currentTest, section: this.currentSection, questionId: this.currentQuestionId, answerId: answerId})
     }
   }
 }
