@@ -15,6 +15,8 @@ https://zellwk.com/blog/install-mongodb/
 
 ## Run Mongo
 
+(Will be different for Windows - will find the command...)
+
 ```
 mongod --config /usr/local/etc/mongod.conf
 ```
