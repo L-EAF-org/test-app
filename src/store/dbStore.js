@@ -432,6 +432,7 @@ module.exports = {
       }
     })
   },
+
   saveQuestionType: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('saveQuestionType', data) }
@@ -439,7 +440,14 @@ module.exports = {
     db.collection('leafTestQuestions').findOne({testId: data.testId, sectionId: data.sectionId, id: data.questionId}, function(err, res) {
       if (err) throw err
       if (res) {
-        res.multiple = data.multiple
+        // TODO: Make this one property - single/trueFalse/multiple
+        if (data.trueFalse) {
+          res.trueFalse = data.trueFalse
+          res.multiple = false
+        } else {
+          res.trueFalse = false
+          res.multiple = data.multiple
+        }
         const id = res._id
         delete res._id
         db.collection('leafTestQuestions').updateOne({'_id': id}, {$set: res}, function(err, res) {

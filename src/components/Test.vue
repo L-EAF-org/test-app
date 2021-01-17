@@ -25,12 +25,18 @@
             </td>
           </tr>
           <tr v-for="(answer, aindex) in question.answers" :key="aindex" class="answer">
-            <td>
+            <td v-if="!question.trueFalse">
               <input v-if="!question.multiple" type="radio" :name="'question-' + question.id">
               <input v-if="question.multiple" type="checkbox">
             </td>
-            <td>
+            <td v-if="!question.trueFalse">
               {{ answer.value }}
+            </td>
+          </tr>
+          <tr v-if="question.trueFalse">
+            <td colspan="2" v-if="question.trueFalse">
+              True <input :id="'question-true-' + question.id" type="checkbox" @click="setTrue(question.id)">
+              False <input :id="'question-false-' + question.id" type="checkbox" @click="setFalse(question.id)">
             </td>
           </tr>
         </table>
@@ -68,6 +74,14 @@ export default {
     loadTest() {
       const id = document.getElementById('test-select').value
       this.socket.emit('loadTest', {id: id})
+    },
+    setTrue(id) {
+      document.getElementById('question-true-' + id).checked = true
+      document.getElementById('question-false-' + id).checked = false
+    },
+    setFalse(id) {
+      document.getElementById('question-false-' + id).checked = true
+      document.getElementById('question-true-' + id).checked = false
     }
   }
 }

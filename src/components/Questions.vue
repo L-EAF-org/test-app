@@ -76,13 +76,16 @@
                 <div class="answer-type">
                   Answer Type:
                   <input :name="'question-type-' + question.id" :id="'question-type-single-' + question.id" type="radio"
-                         :checked="!question.multiple" @click="saveQuestionType()"
+                         :checked="!question.multiple && !question.trueFalse" @click="saveQuestionType()"
                   > Choose one answer
+                  <input :name="'question-type-' + question.id" :id="'question-type-true-false-' + question.id" type="radio"
+                         :checked="question.trueFalse" @click="saveQuestionType()"
+                  > True/False
                   <input :name="'question-type-' + question.id" :id="'question-type-multiple-' + question.id" type="radio"
-                         :checked="question.multiple" @click="saveQuestionType()"
+                         :checked="question.multiple && !question.trueFalse" @click="saveQuestionType()"
                   > Select all that apply
                 </div>
-                <table class="answers">
+                <table class="answers" v-if="!question.trueFalse">
                   <tr>
                     <td class="header">
                       Actions
@@ -194,7 +197,8 @@ export default {
     },
     saveQuestionType() {
       const multiple = document.getElementById('question-type-multiple-' + this.currentQuestionId).checked
-      this.socket.emit('saveQuestionType', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, multiple: multiple})
+      const trueFalse = document.getElementById('question-type-true-false-' + this.currentQuestionId).checked
+      this.socket.emit('saveQuestionType', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, multiple: multiple, trueFalse: trueFalse})
     },
     saveQuestion() {
       const question = document.getElementById('question-' + this.currentQuestionId).value
