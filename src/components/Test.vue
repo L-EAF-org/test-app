@@ -91,6 +91,7 @@ export default {
   .test-questions {
     h3 {
       text-align: left;
+      margin-top: 24px;
     }
     h5 {
       margin-left: 24px;
