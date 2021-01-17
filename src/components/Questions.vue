@@ -96,6 +96,7 @@
                   </tr>
                   <tr v-for="(answer, aindex) in question.answers" :key="aindex">
                     <td>
+                      <i title="save" @click="saveAnswer(answer.id)" class="fas fa-save" />
                       <i title="Delete" class="fas fa-trash-alt" @click="deleteAnswer(answer.id)" />
                       <i v-if="aindex > 0" title="Move Up" class="fas fa-chevron-up" @click="moveAnswerUp(answer.id, answer.order)" />
                       <i v-if="aindex < question.answers.length - 1" title="Move Down" class="fas fa-chevron-down" @click="moveAnswerDown(answer.id, answer.order)" />
@@ -104,7 +105,7 @@
                       <input type="checkbox" :checked="answer.answer" @click="makeAnswer(answer.id)">
                     </td>
                     <td>
-                      <input type="text" :value="answer.value">
+                      <input type="text" :id="'answer-' + answer.id" :value="answer.value">
                     </td>
                   </tr>
                   <tr>
@@ -204,6 +205,10 @@ export default {
       const answer = document.getElementById('new-answer').value
       this.socket.emit('addAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, answer: answer})
       document.getElementById('new-answer').value = ''
+    },
+    saveAnswer(id) {
+      const answer = document.getElementById('answer-' + id).value
+      this.socket.emit('saveAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id, value: answer})
     },
     makeAnswer(answerId) {
       this.socket.emit('makeAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, answerId: answerId})

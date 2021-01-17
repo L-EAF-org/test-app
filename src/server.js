@@ -110,6 +110,9 @@ function doDb(fun, data) {
       case 'addAnswer':
         dbStore.addAnswer(db, io, data, debugOn)
         break
+      case 'saveAnswer':
+        dbStore.saveAnswer(db, io, data, debugOn)
+        break
       case 'makeAnswer':
         dbStore.makeAnswer(db, io, data, debugOn)
         break
@@ -184,6 +187,8 @@ io.on('connection', (socket) => {
   socket.on('moveQuestionDown', (data) => { doDb('moveQuestionDown', data) })
 
   socket.on('addAnswer', (data) => { doDb('addAnswer', data) })
+
+  socket.on('saveAnswer', (data) => { doDb('saveAnswer', data) })
 
   socket.on('makeAnswer', (data) => { doDb('makeAnswer', data) })
 

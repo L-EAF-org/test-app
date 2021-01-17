@@ -330,6 +330,31 @@ module.exports = {
     })
   },
 
+  saveAnswer: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('saveAnswer', data) }
+
+    db.collection('leafTestQuestions').findOne({testId: data.testId, sectionId: data.sectionId, id: data.questionId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const answers = []
+        for (let i = 0; i < res.answers.length; i++) {
+          const answer = res.answers[i]
+          if (answer.id == data.id) {
+            answer.value = data.value
+          }
+          answers.push(answer)
+        }
+        db.collection('leafTestQuestions').updateOne({id: data.questionId}, {$set: {answers: answers}}, function(err, res) {
+          if (err) throw err
+          if (res) {
+            _loadQuestions(db, io, data)
+          }
+        })
+      }
+    })
+  },
+
   deleteAnswer: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('deleteAnswer', data) }
