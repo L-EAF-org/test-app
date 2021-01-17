@@ -182,7 +182,6 @@ module.exports = {
 
     db.collection('leafTestSections').find({testId: data.testId}).toArray(function(err, res) {
       if (err) throw err
-      console.log('N', res.length)
       const order = res.length ? res.length + 1 : 1
       db.collection('leafTestSections').insertOne({testId: data.testId, id: uuidv4(), order: order, section: data.section}, function(err, res) {
         if (err) throw err
