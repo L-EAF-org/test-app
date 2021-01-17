@@ -183,8 +183,12 @@ export default {
     },
     addQuestion() {
       const question = document.getElementById('new-question').value
-      this.socket.emit('addQuestion', {testId: this.currentTest, sectionId: this.currentSection, question: question})
-      document.getElementById('new-question').value = ''
+      if (!question) {
+        alert('Please enter a value')
+      } else {
+        this.socket.emit('addQuestion', {testId: this.currentTest, sectionId: this.currentSection, question: question})
+        document.getElementById('new-question').value = ''
+      }
     },
     deleteQuestion(id) {
       this.socket.emit('deleteQuestion', {testId: this.currentTest, sectionId: this.currentSection, id: id})
@@ -202,17 +206,29 @@ export default {
     },
     saveQuestion() {
       const question = document.getElementById('question-' + this.currentQuestionId).value
-      this.socket.emit('saveQuestionQuestion', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, question: question})
-      this.currentQuestionId = ''
+      if (!question) {
+        alert('Please enter a value')
+      } else {
+        this.socket.emit('saveQuestionQuestion', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, question: question})
+        this.currentQuestionId = ''
+      }
     },
     addAnswer() {
       const answer = document.getElementById('new-answer').value
-      this.socket.emit('addAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, answer: answer})
-      document.getElementById('new-answer').value = ''
+      if (!answer) {
+        alert('Please enter a value')
+      } else {
+        this.socket.emit('addAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, answer: answer})
+        document.getElementById('new-answer').value = ''
+      }
     },
     saveAnswer(id) {
       const answer = document.getElementById('answer-' + id).value
-      this.socket.emit('saveAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id, value: answer})
+      if (!answer) {
+        alert('Please enter a value')
+      } else {
+        this.socket.emit('saveAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id, value: answer})
+      }
     },
     makeAnswer(answerId) {
       this.socket.emit('makeAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, answerId: answerId})

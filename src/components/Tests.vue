@@ -54,12 +54,20 @@ export default {
     },
     addTest() {
       const test = document.getElementById('new-test').value
-      this.socket.emit('addTest', {test: test})
-      document.getElementById('new-test').value = ''
+      if (!test) {
+        alert('Please enter a value')
+      } else {
+        this.socket.emit('addTest', {test: test})
+        document.getElementById('new-test').value = ''
+      }
     },
     updateTest(id) {
       const test = document.getElementById('test-' + id).value
-      this.socket.emit('updateTest', {testId: id, test: test})
+      if (!test) {
+        alert('Please enter a value')
+      } else {
+        this.socket.emit('updateTest', {testId: id, test: test})
+      }
     },
     deleteTest(id) {
       this.socket.emit('deleteTest', {testId: id})

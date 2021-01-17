@@ -80,12 +80,20 @@ export default {
     },
     addSection() {
       const section = document.getElementById('new-section').value
-      this.socket.emit('addSection', {testId: this.currentTest, section: section})
-      document.getElementById('new-section').value = ''
+      if (!section) {
+        alert('Please enter a value')
+      } else {
+        this.socket.emit('addSection', {testId: this.currentTest, section: section})
+        document.getElementById('new-section').value = ''
+      }
     },
     updateSection(id) {
       const section = document.getElementById('section-' + id).value
-      this.socket.emit('updateSection', {testId: this.currentTest, sectionId: id, section: section})
+      if (!section) {
+        alert('Please enter a value')
+      } else {
+        this.socket.emit('updateSection', {testId: this.currentTest, sectionId: id, section: section})
+      }
     },
     moveUp(id, order) {
       this.socket.emit('moveSectionUp', {testId: this.currentTest, sectionId: id, order: order})
