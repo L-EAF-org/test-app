@@ -41,8 +41,10 @@
               <i v-if="index < sections.length - 1" title="Move Down" class="fas fa-chevron-down" @click="moveDown(section.id, section.order)" />
             </td>
             <td>
-              {{ section. order }}
-              <input type="text" :value="section.section" :id="'section-' + section.id">
+              <input type="text" class="section-name" :value="section.section" :id="'section-' + section.id">
+              Select <input type="number" :id="'section-questions-' + section.id" @change="questionsToShow(section.id)" :value="section.questionsToShow">
+              out of {{ section.questions }}
+              questions (<i>leave blank for all</i>)
             </td>
           </tr>
         </table>
@@ -95,6 +97,11 @@ export default {
         this.socket.emit('updateSection', {testId: this.currentTest, sectionId: id, section: section})
       }
     },
+    questionsToShow(id) {
+      const n = document.getElementById('section-questions-' + id).value
+      this.socket.emit('updateSectionQuestionsToShow', {id: id, questionsToShow: n})
+
+    },
     moveUp(id, order) {
       this.socket.emit('moveSectionUp', {testId: this.currentTest, sectionId: id, order: order})
     },
@@ -117,6 +124,10 @@ export default {
 
     input[type=text] {
       width: 200px;
+    }
+
+    .section-name {
+      margin-right: 24px;
     }
   }
 </style>

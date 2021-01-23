@@ -17,11 +17,14 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
-        <li class="nav-item" :class="{ active: !showFacilitator }">
-          <a class="nav-link pointer" @click="updateShowFacilitator(false)">Test</a>
+        <li class="nav-item" :class="{ active: currentTab == 'test' }">
+          <a class="nav-link pointer" @click="updateTab('test')">Test</a>
         </li>
-        <li v-if="isHost" class="nav-item" :class="{ active: showFacilitator }">
-          <a class="nav-link pointer" @click="updateShowFacilitator(true)">Facilitator</a>
+        <li v-if="isHost" class="nav-item" :class="{ active: currentTab == 'results' }">
+          <a class="nav-link pointer" @click="updateTab('results')">Results</a>
+        </li>
+        <li v-if="isHost" class="nav-item" :class="{ active: currentTab == 'setup' }">
+          <a class="nav-link pointer" @click="updateTab('setup')">Set Up</a>
         </li>
         <li class="nav-item">
           <a class="nav-link pointer" @click="show()">Feedback</a>
@@ -63,16 +66,16 @@ export default {
     isHost() {
       return this.$store.getters.getHost
     },
-    showFacilitator() {
-      return this.$store.getters.getShowFacilitator
+    currentTab() {
+      return this.$store.getters.getCurrentTab
     },
     thisGame() {
       return this.$store.getters.getThisGame
     }
   },
   methods: {
-    updateShowFacilitator(payload) {
-      this.$store.dispatch('updateShowFacilitator', payload)
+    updateTab(tab) {
+      this.$store.dispatch('updateCurrentTab', tab)
     },
     show () {
       this.$modal.show('feedback')

@@ -57,10 +57,32 @@ function doDb(fun, data) {
     const db = client.db('db')
 
     switch(fun) {
+      case 'loadTestOrganisationStudents':
+        dbStore.loadTestOrganisationStudents(db, io, data, debugOn)
+        break
       case 'loadTest':
         dbStore.loadTest(db, io, data, debugOn)
         break
+      case 'createTestInstance':
+        dbStore.createTestInstance(db, io, data, debugOn)
+        break
+      case 'setAnswer':
+        dbStore.setAnswer(db, io, data, debugOn)
+        break
 
+      case 'loadTestInstances':
+        dbStore.loadTestInstances(db, io, debugOn)
+        break
+      case 'deleteTestInstance':
+        dbStore.deleteTestInstance(db, io, data, debugOn)
+        break
+
+      case 'loadOrganisations':
+        dbStore.loadOrganisations(db, io, debugOn)
+        break
+      case 'loadStudents':
+        dbStore.loadStudents(db, io, data, debugOn)
+        break
       case 'loadTests':
         dbStore.loadTests(db, io, debugOn)
         break
@@ -71,6 +93,27 @@ function doDb(fun, data) {
         dbStore.loadQuestions(db, io, data, debugOn)
         break
 
+      case 'addOrganisation':
+        dbStore.addOrganisation(db, io, data, debugOn)
+        break
+      case 'updateOrganisation':
+        dbStore.updateOrganisation(db, io, data, debugOn)
+        break
+      case 'setOrganisationTest':
+        dbStore.setOrganisationTest(db, io, data, debugOn)
+        break
+      case 'deleteOrganisation':
+        dbStore.deleteOrganisation(db, io, data, debugOn)
+        break
+      case 'addStudent':
+        dbStore.addStudent(db, io, data, debugOn)
+        break
+      case 'updateStudent':
+        dbStore.updateStudent(db, io, data, debugOn)
+        break
+      case 'deleteStudent':
+        dbStore.deleteStudent(db, io, data, debugOn)
+        break
       case 'addTest':
         dbStore.addTest(db, io, data, debugOn)
         break
@@ -78,13 +121,16 @@ function doDb(fun, data) {
         dbStore.updateTest(db, io, data, debugOn)
         break
       case 'deleteTest':
-          dbStore.deleteTest(db, io, data, debugOn)
-          break
+        dbStore.deleteTest(db, io, data, debugOn)
+        break
       case 'addSection':
         dbStore.addSection(db, io, data, debugOn)
         break
       case 'updateSection':
         dbStore.updateSection(db, io, data, debugOn)
+        break
+      case 'updateSectionQuestionsToShow':
+        dbStore.updateSectionQuestionsToShow(db, io, data, debugOn)
         break
       case 'deleteSection':
         dbStore.deleteSection(db, io, data, debugOn)
@@ -115,6 +161,9 @@ function doDb(fun, data) {
         break
       case 'makeAnswer':
         dbStore.makeAnswer(db, io, data, debugOn)
+        break
+      case 'makeTrueFalseAnswer':
+        dbStore.makeTrueFalseAnswer(db, io, data, debugOn)
         break
       case 'deleteAnswer':
         dbStore.deleteAnswer(db, io, data, debugOn)
@@ -152,15 +201,45 @@ io.on('connection', (socket) => {
 
   // Test
 
+  socket.on('loadTestOrganisationStudents', (data) => { doDb('loadTestOrganisationStudents', data) })
+
   socket.on('loadTest', (data) => { doDb('loadTest', data) })
 
+  socket.on('createTestInstance', (data) => { doDb('createTestInstance', data) })
+
+  socket.on('setAnswer', (data) => { doDb('setAnswer', data) })
+
+  // Results
+
+  socket.on('loadTestInstances', () => { doDb('loadTestInstances') })
+
+  socket.on('deleteTestInstance', (data) => { doDb('deleteTestInstance', data) })
+
   // Facilitator
+
+  socket.on('loadOrganisations', () => { doDb('loadOrganisations') })
+
+  socket.on('loadStudents', (data) => { doDb('loadStudents', data) })
 
   socket.on('loadTests', () => { doDb('loadTests') })
 
   socket.on('loadSections', (data) => { doDb('loadSections', data) })
 
   socket.on('loadQuestions', (data) => { doDb('loadQuestions', data) })
+
+  socket.on('addOrganisation', (data) => { doDb('addOrganisation', data) })
+
+  socket.on('updateOrganisation', (data) => { doDb('updateOrganisation', data) })
+
+  socket.on('setOrganisationTest', (data) => { doDb('setOrganisationTest', data) })
+
+  socket.on('deleteOrganisation', (data) => { doDb('deleteOrganisation', data) })
+
+  socket.on('addStudent', (data) => { doDb('addStudent', data) })
+
+  socket.on('updateStudent', (data) => { doDb('updateStudent', data) })
+
+  socket.on('deleteStudent', (data) => { doDb('deleteStudent', data) })
 
   socket.on('addTest', (data) => { doDb('addTest', data) })
 
@@ -171,6 +250,8 @@ io.on('connection', (socket) => {
   socket.on('addSection', (data) => { doDb('addSection', data) })
 
   socket.on('updateSection', (data) => { doDb('updateSection', data) })
+
+  socket.on('updateSectionQuestionsToShow', (data) => { doDb('updateSectionQuestionsToShow', data) })
 
   socket.on('deleteSection', (data) => { doDb('deleteSection', data) })
 
@@ -191,6 +272,8 @@ io.on('connection', (socket) => {
   socket.on('saveAnswer', (data) => { doDb('saveAnswer', data) })
 
   socket.on('makeAnswer', (data) => { doDb('makeAnswer', data) })
+
+  socket.on('makeTrueFalseAnswer', (data) => { doDb('makeTrueFalseAnswer', data) })
 
   socket.on('deleteAnswer', (data) => { doDb('deleteAnswer', data) })
 

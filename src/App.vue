@@ -3,14 +3,9 @@
     <Header />
     <div class="container">
       <h1>L-EAF.org Test Centre</h1>
-      <div v-if="showFacilitator">
-        <Tests :socket="socket" />
-        <Sections :socket="socket" />
-        <Questions :socket="socket" />
-      </div>
-      <div v-if="!showFacilitator">
-        <Test :socket="socket" />
-      </div>
+      <Test v-if="currentTab == 'test'" :socket="socket" />
+      <Results v-if="currentTab == 'results'" :socket="socket" />
+      <SetUp v-if="currentTab == 'setup'" :socket="socket" />
     </div>
   </div>
 </template>
@@ -22,25 +17,23 @@ import params from './lib/params.js'
 
 import Header from './components/Header.vue'
 import Test from './components/Test.vue'
-import Tests from './components/Tests.vue'
-import Sections from './components/Sections.vue'
-import Questions from './components/Questions.vue'
+import Results from './components/Results.vue'
+import SetUp from './components/SetUp.vue'
 
 export default {
   name: 'App',
   components: {
     Header,
     Test,
-    Tests,
-    Sections,
-    Questions
+    Results,
+    SetUp
   },
   computed: {
     isHost() {
       return this.$store.getters.getHost
     },
-    showFacilitator() {
-      return this.$store.getters.getShowFacilitator
+    currentTab() {
+      return this.$store.getters.getCurrentTab
     }
   },
   created() {
@@ -57,7 +50,28 @@ export default {
       this.$store.dispatch('updateHost', true)
     }
 
+    this.socket.on('loadOrganisations', (data) => {
+      this.$store.dispatch('loadOrganisations', data)
+    })
+
+    this.socket.on('loadStudents', (data) => {
+      this.$store.dispatch('loadStudents', data)
+    })
+
+    this.socket.on('loadTests', (data) => {
+      this.$store.dispatch('loadTests', data)
+    })
+
+    this.socket.on('loadSections', (data) => {
+      this.$store.dispatch('loadSections', data)
+    })
+
+    this.socket.on('loadQuestions', (data) => {
+      this.$store.dispatch('loadQuestions', data)
+    })
+
     this.socket.emit('loadTests')
+    this.socket.emit('loadOrganisations')
   },
   methods: {
   }
@@ -65,7 +79,9 @@ export default {
 </script>
 
 <style lang="scss">
-.config-test-tests, .config-test-sections, .config-test-questions {
+.config-test-organisations, .config-test-students,
+.config-test-tests, .config-test-sections,
+.config-test-questions {
   width: 100%;
   margin: 12px;
   border: 1px solid #ccc;
@@ -106,7 +122,7 @@ export default {
     &.left-col {
       vertical-align: top;
     }
-    .fa-edit, .fa-save, .fa-trash-alt, .fa-chevron-up, .fa-chevron-down {
+    .fa-edit, .fa-save, .fa-trash-alt, .fa-chevron-up, .fa-chevron-down, .fa-file-alt {
       color: #888;
       font-size: x-large;
       margin: 4px;

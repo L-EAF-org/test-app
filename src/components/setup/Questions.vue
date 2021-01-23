@@ -120,6 +120,11 @@
                     </td>
                   </tr>
                 </table>
+                <div v-if="question.trueFalse" class="true-false">
+                  Correct Answer:
+                  True <input :name="'answer-' + question.id" type="radio" :checked="question.answer" @click="setTrueFalseAnswer(question.id, true)">
+                  False <input :name="'answer-' + question.id" type="radio" :checked="!question.answer" @click="setTrueFalseAnswer(question.id, false)">
+                </div>
               </div>
             </td>
           </tr>
@@ -152,19 +157,6 @@ export default {
     questions() {
       return this.$store.getters.getQuestions
     }
-  },
-  created() {
-    this.socket.on('loadTests', (data) => {
-      this.$store.dispatch('loadTests', data)
-    })
-
-    this.socket.on('loadSections', (data) => {
-      this.$store.dispatch('loadSections', data)
-    })
-
-    this.socket.on('loadQuestions', (data) => {
-      this.$store.dispatch('loadQuestions', data)
-    })
   },
   methods: {
     setShowTestQuestions(val) {
@@ -241,7 +233,11 @@ export default {
     },
     deleteAnswer(id) {
       this.socket.emit('deleteAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id})
-    }
+    },
+    setTrueFalseAnswer(questionId, val) {
+      this.socket.emit('makeTrueFalseAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, val: val})
+    },
+
   }
 }
 </script>
@@ -298,6 +294,17 @@ export default {
       margin: 12px 0 12px 32px;
       td {
         text-align: center;
+      }
+    }
+
+    .true-false {
+      margin-top: 16px;
+      text-align: center;
+
+      input {
+        height: 20px;
+        position: relative;
+        top: 5px;
       }
     }
   }

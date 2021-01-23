@@ -1,5 +1,21 @@
 
+const questionFuns = require('./lib/questions.js')
+
 const { v4: uuidv4 } = require('uuid')
+
+function _loadOrganisations(db, io) {
+  db.collection('leafTestOrganisations').find().toArray(function(err, res) {
+    if (err) throw err
+    io.emit('loadOrganisations', res)
+  })
+}
+
+function _loadStudents(db, io, data) {
+  db.collection('leafTestStudents').find({organisationId: data.organisationId}).toArray(function(err, res) {
+    if (err) throw err
+    io.emit('loadStudents', res)
+  })
+}
 
 function _loadTests(db, io) {
   db.collection('leafTestTests').find().toArray(function(err, res) {
@@ -18,7 +34,14 @@ function _loadSections(db, io, data) {
 function _loadQuestions(db, io, data) {
   db.collection('leafTestQuestions').find({testId: data.testId, sectionId: data.sectionId}).toArray(function(err, res) {
     if (err) throw err
+    _updateSectionQuestions(db, data.sectionId, res.length)
     io.emit('loadQuestions', res)
+  })
+}
+
+function _updateSectionQuestions(db, id, n) {
+  db.collection('leafTestSections').updateOne({id: id}, {$set: {questions: n}}, function(err, ) {
+    if (err) throw err
   })
 }
 
@@ -87,35 +110,224 @@ function swapAnswers(db, io, data, res, order1, order2) {
   })
 }
 
+function _loadTestInstance(db, io, id) {
+  db.collection('leafTestTestInstances').findOne({id: id}, function(err, res) {
+    if (err) throw err
+    const testInstance = {
+      id: id,
+      correct: res.correct,
+      organisation: res.organisation,
+      test: res.test,
+      student: res.student
+    }
+    io.emit('loadTestInstance', testInstance)
+  })
+}
+
 module.exports = {
+
+  loadTestOrganisationStudents: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('loadTestOrganisationStudents', data) }
+
+    db.collection('leafTestStudents').find({organisationId: data.organisationId}).toArray(function(err, res) {
+      if (err) throw err
+      if (res.length) {
+        const students = []
+        for (let r = 0; r < res.length; r++) {
+          students.push({
+            id: res[r].id,
+            student: res[r].student
+          })
+        }
+        io.emit('loadTestOrganisationStudents', students)
+      }
+    })
+  },
 
   loadTest: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('loadTest', data) }
 
-    db.collection('leafTestSections').find({testId: data.id}).toArray(function(err, res) {
+    db.collection('leafTestTests').findOne({id: data.id}, function(err, res) {
       if (err) throw err
-      if (res.length) {
-        const sections = []
-        for (let r = 0; r < res.length; r++) {
-          sections.push({id: res[r].id, section: res[r].section, questions: []})
-        }
-        db.collection('leafTestQuestions').find({testId: data.id}).toArray(function(err, secRes) {
+      if (res) {
+        data.test = res.test
+        db.collection('leafTestSections').find({testId: data.id}).toArray(function(err, res) {
           if (err) throw err
-          if (secRes.length) {
-            for (let i = 0; i < secRes.length; i++) {
-              for (let j = 0; j < sections.length; j++) {
-                if (secRes[i].sectionId == sections[j].id) {
-                  sections[j].questions.push(secRes[i])
-                }
-              }
+          if (res.length) {
+            const sections = []
+            for (let r = 0; r < res.length; r++) {
+              sections.push({id: res[r].id, section: res[r].section, questions: []})
             }
-            data.sections = sections
-            io.emit('loadTest', data)
+            db.collection('leafTestQuestions').find({testId: data.id}).toArray(function(err, secRes) {
+              if (err) throw err
+              if (secRes.length) {
+                for (let i = 0; i < secRes.length; i++) {
+                  for (let j = 0; j < sections.length; j++) {
+                    if (secRes[i].sectionId == sections[j].id) {
+                      sections[j].questions.push(secRes[i])
+                    }
+                  }
+                }
+                data.sections = sections
+                io.emit('loadTest', data)
+              }
+            })
           }
         })
       }
     })
+  },
+
+  createTestInstance: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('createTestInstance', data) }
+
+    const correct = {
+      questions: 0,
+      sections: 0
+    }
+    db.collection('leafTestTestInstances').insertOne({id: data.id, date: new Date().toISOString(), correct: correct}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        db.collection('leafTestOrganisations').findOne({id: data.organisationId}, function(err, orgRes) {
+          if (err) throw err
+          if (orgRes) {
+            const organisation = {
+              id: orgRes.id,
+              organisation: orgRes.organisation
+            }
+            db.collection('leafTestTestInstances').updateOne({id: data.id}, {$set: {organisation: organisation}}, function(err, res) {
+              if (err) throw err
+              _loadTestInstance(db, io, data.id)
+            })
+          }
+        })
+        db.collection('leafTestTests').findOne({id: data.testId}, function(err, testRes) {
+          if (err) throw err
+          if (testRes) {
+            db.collection('leafTestSections').find({testId: testRes.id}).toArray(function(err, res) {
+              if (err) throw err
+              if (res.length) {
+                const sections = []
+                for (let r = 0; r < res.length; r++) {
+                  sections.push({id: res[r].id, section: res[r].section, questions: []})
+                }
+                db.collection('leafTestQuestions').find({testId: testRes.id}).toArray(function(err, secRes) {
+                  if (err) throw err
+                  if (secRes.length) {
+                    for (let i = 0; i < secRes.length; i++) {
+                      for (let j = 0; j < sections.length; j++) {
+                        if (secRes[i].sectionId == sections[j].id) {
+                          sections[j].questions.push(secRes[i])
+                        }
+                      }
+                    }
+                  }
+                  const test = {
+                    id: testRes.id,
+                    test: testRes.test,
+                    sections: sections
+                  }
+                  db.collection('leafTestTestInstances').updateOne({id: data.id}, {$set: {test: test}}, function(err, res) {
+                    if (err) throw err
+                    _loadTestInstance(db, io, data.id)
+                  })
+                })
+              }
+            })
+          }
+        })
+        db.collection('leafTestStudents').findOne({id: data.studentId}, function(err, studentRes) {
+          if (err) throw err
+          if (studentRes) {
+            const student = {
+              id: studentRes.id,
+              student: studentRes.student
+            }
+            db.collection('leafTestTestInstances').updateOne({id: data.id}, {$set: {student: student}}, function(err, res) {
+              if (err) throw err
+              _loadTestInstance(db, io, data.id)
+            })
+          }
+        })
+      }
+    })
+  },
+
+  deleteTestInstance: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('deleteTestInstance', data) }
+
+    db.collection('leafTestTestInstances').deleteOne({id: data.id}, function(err, res) {
+      if (err) throw err
+      db.collection('leafTestTestInstances').find().toArray(function(err, res) {
+        if (err) throw err
+        io.emit('loadTestInstances', res)
+      })
+    })
+  },
+
+  setAnswer: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('setAnswer', data) }
+
+    db.collection('leafTestTestInstances').findOne({id: data.testInstanceId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        let correct = {
+          sections: 0,
+          questions: 0
+        }
+        const sections = []
+        for (let i = 0; i < res.test.sections.length; i++) {
+          const questions = []
+          const section = res.test.sections[i]
+          for (let j = 0; j < section.questions.length; j++) {
+            let question = section.questions[j]
+            if (question.id == data.questionId) {
+              question = questionFuns.answer(question, data.answerId, data.value)
+            }
+            if (question.correct) {
+              correct.questions = correct.questions + 1
+            }
+            questions.push(question)
+          }
+          section.questions = questions
+          sections.push(section)
+        }
+        res.test.sections = sections
+        db.collection('leafTestTestInstances').updateOne({id: data.testInstanceId}, {$set: {correct: correct, test: res.test}}, function(err, res) {
+          if (err) throw err
+          _loadTestInstance(db, io, data.testInstanceId)
+        })
+      }
+    })
+  },
+
+  loadTestInstances: function(db, io, debugOn) {
+
+    if (debugOn) { console.log('loadTestInstances') }
+
+    db.collection('leafTestTestInstances').find().toArray(function(err, res) {
+      if (err) throw err
+      if (res.length) {
+        io.emit('loadTestInstances', res)
+      }
+    })
+  },
+
+  loadOrganisations: function(db, io, debugOn) {
+
+    if (debugOn) { console.log('loadOrganisations') }
+    _loadOrganisations(db, io)
+  },
+
+  loadStudents: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('loadStudents', data) }
+    _loadStudents(db, io, data)
   },
 
   loadTests: function(db, io, debugOn) {
@@ -134,6 +346,104 @@ module.exports = {
 
     if (debugOn) { console.log('loadQuestions', data) }
     _loadQuestions(db, io, data)
+  },
+
+  addOrganisation: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('addOrganisation', data) }
+
+    db.collection('leafTestOrganisations').insertOne({organisation: data.organisation, id: uuidv4()}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        _loadOrganisations(db, io)
+      }
+    })
+  },
+
+  updateOrganisation: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('updateOrganisation', data) }
+
+    db.collection('leafTestOrganisations').findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        res.organisation = data.organisation
+        const id = res._id
+        delete res._id
+        db.collection('leafTestOrganisations').updateOne({'_id': id}, {$set: res}, function(err, res) {
+          if (err) throw err
+          _loadOrganisations(db, io)
+        })
+      }
+    })
+  },
+
+  setOrganisationTest: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('setOrganisationTest', data) }
+
+    db.collection('leafTestOrganisations').findOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        const tests = res.tests ? res.tests : {}
+        tests[data.testId] = {
+          test: data.test,
+          value: data.value
+        }
+        db.collection('leafTestOrganisations').updateOne({'_id': res._id}, {$set: {tests: tests}}, function(err, res) {
+          if (err) throw err
+          _loadOrganisations(db, io)
+        })
+      }
+    })
+  },
+
+  deleteOrganisation: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('deleteOrganisation', data) }
+
+    db.collection('leafTestOrganisations').deleteOne({id: data.organisationId}, function(err, res) {
+      if (err) throw err
+      _loadOrganisations(db, io)
+    })
+  },
+
+  addStudent: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('addStudent', data) }
+
+    db.collection('leafTestStudents').insertOne({organisationId: data.organisationId, id: uuidv4(), student: data.student}, function(err, res) {
+      if (err) throw err
+      _loadStudents(db, io, data)
+    })
+  },
+
+  updateStudent: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('updateStudent', data) }
+
+    db.collection('leafTestStudents').findOne({id: data.studentId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        res.student = data.student
+        const id = res._id
+        delete res._id
+        db.collection('leafTestStudents').updateOne({'_id': id}, {$set: res}, function(err, res) {
+          if (err) throw err
+          _loadStudents(db, io, data)
+        })
+      }
+    })
+  },
+
+  deleteStudent: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('deleteStudent', data) }
+
+    db.collection('leafTestStudents').deleteOne({id: data.studentId}, function(err, res) {
+      if (err) throw err
+      _loadStudents(db, io, data)
+    })
   },
 
   addTest: function(db, io, data, debugOn) {
@@ -210,6 +520,23 @@ module.exports = {
     })
   },
 
+  updateSectionQuestionsToShow: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('updateSectionQuestionsToShow', data) }
+
+    db.collection('leafTestSections').findOne({id: data.id}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        res.questionsToShow = data.questionsToShow
+        const id = res._id
+        delete res._id
+        db.collection('leafTestSections').updateOne({'_id': id}, {$set: res}, function(err, res) {
+          if (err) throw err
+        })
+      }
+    })
+  },
+
   moveSectionUp: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('moveSectionUp', data) }
@@ -260,6 +587,7 @@ module.exports = {
         multiple: false,
         answers: []
       }
+      _updateSectionQuestions(db, data.sectionId, order)
       db.collection('leafTestQuestions').insertOne(newRes, function(err, res) {
         if (err) throw err
         if (res) {
@@ -275,7 +603,10 @@ module.exports = {
 
     db.collection('leafTestQuestions').deleteOne({id: data.id}, function(err, res) {
       if (err) throw err
-      _loadQuestions(db, io, data)
+      db.collection('leafTestQuestions').find({testId: data.testId, sectionId: data.sectionId}).toArray(function(err, res) {
+        _updateSectionQuestions(db, data.sectionId, res.length)
+        _loadQuestions(db, io, data)
+      })
     })
   },
 
@@ -399,6 +730,23 @@ module.exports = {
         const id = res._id
         delete res._id
         db.collection('leafTestQuestions').updateOne({'_id': id}, {$set: res}, function(err, res) {
+          if (err) throw err
+          if (res) {
+            _loadQuestions(db, io, data)
+          }
+        })
+      }
+    })
+  },
+
+  makeTrueFalseAnswer: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('makeTrueFalseAnswer', data) }
+
+    db.collection('leafTestQuestions').findOne({testId: data.testId, sectionId: data.sectionId, id: data.questionId}, function(err, res) {
+      if (err) throw err
+      if (res) {
+        db.collection('leafTestQuestions').updateOne({'_id': res._id}, {$set: {answer: data.val}}, function(err, res) {
           if (err) throw err
           if (res) {
             _loadQuestions(db, io, data)
