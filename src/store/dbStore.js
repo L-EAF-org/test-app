@@ -140,42 +140,8 @@ module.exports = {
             student: res[r].student
           })
         }
-        io.emit('loadTestOrganisationStudents', students)
-      }
-    })
-  },
-
-  loadTest: function(db, io, data, debugOn) {
-
-    if (debugOn) { console.log('loadTest', data) }
-
-    db.collection('leafTestTests').findOne({id: data.id}, function(err, res) {
-      if (err) throw err
-      if (res) {
-        data.test = res.test
-        db.collection('leafTestSections').find({testId: data.id}).toArray(function(err, res) {
-          if (err) throw err
-          if (res.length) {
-            const sections = []
-            for (let r = 0; r < res.length; r++) {
-              sections.push({id: res[r].id, section: res[r].section, questions: []})
-            }
-            db.collection('leafTestQuestions').find({testId: data.id}).toArray(function(err, secRes) {
-              if (err) throw err
-              if (secRes.length) {
-                for (let i = 0; i < secRes.length; i++) {
-                  for (let j = 0; j < sections.length; j++) {
-                    if (secRes[i].sectionId == sections[j].id) {
-                      sections[j].questions.push(secRes[i])
-                    }
-                  }
-                }
-                data.sections = sections
-                io.emit('loadTest', data)
-              }
-            })
-          }
-        })
+        data.students = students
+        io.emit('loadTestOrganisationStudents', data)
       }
     })
   },
@@ -256,6 +222,23 @@ module.exports = {
     })
   },
 
+  loadTestInstance: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('loadTestInstance', data) }
+    _loadTestInstance(db, io, data.id)
+  },
+
+  loadStudentTestInstances: function(db, io, data, debugOn) {
+
+    if (debugOn) { console.log('loadStudentTestInstances', data) }
+
+    db.collection('leafTestTestInstances').find({'organisation.id': data.organisationId, 'test.id': data.testId, 'student.id': data.studentId}).toArray(function(err, res) {
+      if (err) throw err
+      data.testInstances = res
+      io.emit('loadStudentTestInstances', data)
+    })
+  },
+
   deleteTestInstance: function(db, io, data, debugOn) {
 
     if (debugOn) { console.log('deleteTestInstance', data) }
@@ -276,7 +259,7 @@ module.exports = {
     db.collection('leafTestTestInstances').findOne({id: data.testInstanceId}, function(err, res) {
       if (err) throw err
       if (res) {
-        let correct = {
+        const correct = {
           sections: 0,
           questions: 0
         }

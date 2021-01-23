@@ -60,11 +60,14 @@ function doDb(fun, data) {
       case 'loadTestOrganisationStudents':
         dbStore.loadTestOrganisationStudents(db, io, data, debugOn)
         break
-      case 'loadTest':
-        dbStore.loadTest(db, io, data, debugOn)
+      case 'loadStudentTestInstances':
+        dbStore.loadStudentTestInstances(db, io, data, debugOn)
         break
       case 'createTestInstance':
         dbStore.createTestInstance(db, io, data, debugOn)
+        break
+      case 'loadTestInstance':
+        dbStore.loadTestInstance(db, io, data, debugOn)
         break
       case 'setAnswer':
         dbStore.setAnswer(db, io, data, debugOn)
@@ -203,9 +206,13 @@ io.on('connection', (socket) => {
 
   socket.on('loadTestOrganisationStudents', (data) => { doDb('loadTestOrganisationStudents', data) })
 
-  socket.on('loadTest', (data) => { doDb('loadTest', data) })
+  socket.on('loadStudentTestInstances', (data) => { doDb('loadStudentTestInstances', data) })
+
+  //socket.on('loadTest', (data) => { doDb('loadTest', data) })
 
   socket.on('createTestInstance', (data) => { doDb('createTestInstance', data) })
+
+  socket.on('loadTestInstance', (data) => { doDb('loadTestInstance', data) })
 
   socket.on('setAnswer', (data) => { doDb('setAnswer', data) })
 

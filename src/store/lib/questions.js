@@ -15,6 +15,7 @@ function singleAnswer(question, answerId) {
   let correct = false
   for (let i = 0; i < question.answers.length; i++) {
     const answer = question.answers[i]
+    answer.submittedAnswer = answer.id == answerId
     if (answer.id == answerId && answer.answer) {
       correct = true
     }
@@ -23,16 +24,17 @@ function singleAnswer(question, answerId) {
 }
 
 function multipleAnswer(question, values) {
-  let correct = true
+  question.correct = true
   for (let i = 0; i < values.length; i++) {
     const answer = question.answers.find(function(a) {
       return a.id == values[i].id
     })
+    answer.submittedAnswer = values[i].value
     if (answer.answer != values[i].value) {
-      correct = false
+      question.correct = false
     }
   }
-  return correct
+  return question
 }
 
 module.exports = {
@@ -40,13 +42,14 @@ module.exports = {
   answer: function(question, answerId, value) {
     switch(questionType(question)) {
       case 'trueFalse':
+        question.submittedAnswer = value
         question.correct = question.answer == value
         break
       case 'single':
         question.correct = singleAnswer(question, answerId)
         break
       case 'multiple':
-        question.correct = multipleAnswer(question, value)
+        question = multipleAnswer(question, value)
         break
     }
     return question

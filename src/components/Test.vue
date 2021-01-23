@@ -15,7 +15,7 @@
         </option>
       </select>
       Test:
-      <select id="test-select" @change="loadTest()">
+      <select id="test-test" @change="setTest()">
         <option value="">
           -- Select --
         </option>
@@ -33,6 +33,22 @@
         </option>
       </select>
     </div>
+    <div class="test-set-up">
+      <div v-if="student.id">
+        Continue:
+        <select id="test-instance" @change="loadTestInstance()">
+          <option value="">
+            -- Select --
+          </option>
+          <option v-for="(tInstance, index) in testInstances" :key="index" :value="tInstance.id">
+            {{ testInstanceLabel(tInstance) }}
+          </option>
+        </select>
+        <button class="btn btn-sm btn-site-primary submit-test" @click="createTestInstance()" :disabled="!(organisationId && test.id && student.id)">
+          Start New
+        </button>
+      </div>
+    </div>
     <h2>
       <span v-if="test.test">{{ test.test }}</span>
       <span v-if="test.test && student.id"> - </span>
@@ -41,8 +57,8 @@
         Submit Test
       </button>
     </h2>
-    <div v-if="student.id" class="test-sections">
-      <div v-for="(section, sindex) in test.sections" :key="sindex">
+    <div v-if="testInstance.test" class="test-sections">
+      <div v-for="(section, sindex) in testInstance.test.sections" :key="sindex">
         <h3>{{ section.section }}</h3>
         <div v-for="(question, qindex) in section.questions" :key="qindex">
           <div class="question">
@@ -56,8 +72,12 @@
             </tr>
             <tr v-for="(answer, aindex) in question.answers" :key="aindex" class="answer">
               <td v-if="!question.trueFalse">
-                <input v-if="!question.multiple" type="radio" :name="'answer-' + question.id" :id="'answer-' + answer.id" @click="setAnswer(question, answer)">
-                <input v-if="question.multiple" type="checkbox" :name="'answer-' + question.id" :id="'answer-' + answer.id" @click="setMultipleAnswer(question)">
+                <input v-if="!question.multiple" type="radio" :name="'answer-' + question.id"
+                       :id="'answer-' + answer.id" @click="setAnswer(question, answer)" :checked="answer.submittedAnswer"
+                >
+                <input v-if="question.multiple" type="checkbox" :name="'answer-' + question.id"
+                       :id="'answer-' + answer.id" @click="setMultipleAnswer(question)" :checked="answer.submittedAnswer"
+                >
               </td>
               <td v-if="!question.trueFalse">
                 {{ answer.value }}
@@ -66,8 +86,10 @@
             </tr>
             <tr v-if="question.trueFalse">
               <td colspan="2" v-if="question.trueFalse">
-                True <span v-if="isHost && question.answer"><i>(answer)</i></span> <input :id="'question-true-' + question.id" type="checkbox" @click="setTrue(question)">
-                False <span v-if="isHost && !question.answer"><i>(answer)</i></span> <input :id="'question-false-' + question.id" type="checkbox" @click="setFalse(question)">
+                True <span v-if="isHost && question.answer"><i>(answer)</i></span>
+                <input :id="'question-true-' + question.id" type="checkbox" @click="setTrue(question)" :checked="question.submittedAnswer">
+                False <span v-if="isHost && !question.answer"><i>(answer)</i></span>
+                <input :id="'question-false-' + question.id" type="checkbox" @click="setFalse(question)" :checked="!question.submittedAnswer">
               </td>
             </tr>
           </table>
@@ -79,6 +101,8 @@
 
 <script>
 const { v4: uuidv4 } = require('uuid')
+
+import dateTime from '../lib/dateTime.js'
 
 import Score from './test/Score.vue'
 
@@ -93,6 +117,7 @@ export default {
     return {
       tests: [],
       students: [],
+      testInstances: [],
       organisationId: null,
       test: {id: '', test: null},
       student: {id: '', test: null},
@@ -116,13 +141,16 @@ export default {
   created() {
     const self = this
 
-    this.socket.on('loadTest', (data) => {
-      self.test = data
-      self.createTestInstance()
+    this.socket.on('loadTestOrganisationStudents', (data) => {
+      if (data.organisationId == self.organisationId) {
+        self.students = data.students
+      }
     })
 
-    this.socket.on('loadTestOrganisationStudents', (data) => {
-      self.students = data
+    this.socket.on('loadStudentTestInstances', (data) => {
+      if (data.organisationId == this.organisationId && data.testId == self.test.id && data.studentId == self.student.id) {
+        self.testInstances = data.testInstances
+      }
     })
 
     this.socket.on('loadTestInstance', (data) => {
@@ -132,12 +160,8 @@ export default {
     })
   },
   methods: {
-    createTestInstance() {
-      if (!this.testInstance.test && this.organisationId && this.test.id && this.student.id) {
-        const id = uuidv4()
-        this.$store.dispatch('updateTestInstance', {id: id})
-        this.socket.emit('createTestInstance', {id: id, organisationId: this.organisationId, testId: this.test.id, studentId: this.student.id})
-      }
+    testInstanceLabel(instance) {
+      return instance.test.test + ' ' + dateTime.format(instance.date)
     },
     loadSelectedOrganisation() {
       const id = document.getElementById('test-organisation').value
@@ -166,10 +190,12 @@ export default {
         this.student = {id: '', student: null}
       }
     },
-    loadTest() {
-      const id = document.getElementById('test-select').value
+    setTest() {
+      const id = document.getElementById('test-test').value
       if (id) {
-        this.socket.emit('loadTest', {id: id})
+        const index = document.getElementById('test-test').options.selectedIndex
+        const test = document.getElementById('test-test').options[index].text
+        this.test = {id: id, test: test}
       } else {
         this.test = {id: '', test: null}
       }
@@ -180,9 +206,25 @@ export default {
         const index = document.getElementById('test-student').options.selectedIndex
         const student = document.getElementById('test-student').options[index].text
         this.student = {id: id, student: student}
-        this.createTestInstance()
+        this.socket.emit('loadStudentTestInstances', {organisationId: this.organisationId, testId: this.test.id, studentId: id})
       } else {
         this.student = {id: '', student: null}
+      }
+    },
+    createTestInstance() {
+      if (this.organisationId && this.test.id && this.student.id) {
+        const id = uuidv4()
+        this.$store.dispatch('updateTestInstance', {id: id})
+        this.socket.emit('createTestInstance', {id: id, organisationId: this.organisationId, testId: this.test.id, studentId: this.student.id})
+      }
+    },
+    loadTestInstance() {
+      const id = document.getElementById('test-instance').value
+      if (id) {
+        this.$store.dispatch('updateTestInstance', {id: id})
+        this.socket.emit('loadTestInstance', {id: id})
+      } else {
+        this.testInstanceId = null
       }
     },
     setAnswer(question, answer) {
@@ -222,6 +264,9 @@ export default {
   .test-questions {
 
     .test-set-up {
+      height: 32px;
+      margin-bottom: 24px;
+
       select {
         width: 160px;
         margin-right: 24px;

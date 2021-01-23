@@ -73,9 +73,6 @@ export const store = new Vuex.Store({
     updateCurrentTab: (state, payload) => {
       state.currentTab = payload
     },
-    loadTest: (state, payload) => {
-      state.test = payload
-    },
     loadTests: (state, payload) => {
       state.tests = payload
     },
@@ -109,9 +106,6 @@ export const store = new Vuex.Store({
     },
     updateCurrentTab: ({ commit }, payload) => {
       commit('updateCurrentTab', payload)
-    },
-    loadTest: ({ commit }, payload) => {
-      commit('loadTest', payload)
     },
     loadOrganisations: ({ commit }, payload) => {
       commit('loadOrganisations', payload)
