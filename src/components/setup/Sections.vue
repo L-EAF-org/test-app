@@ -35,10 +35,10 @@
           </tr>
           <tr v-for="(section, index) in sections" :key="index">
             <td>
-              <i @click="updateSection(section.id)" title="Update Section Name" class="fas fa-save" />
-              <i @click="deleteSection(section.id)" title="Delete Section" class="fas fa-trash-alt" />
-              <i v-if="index > 0" title="Move Up" class="fas fa-chevron-up" @click="moveUp(section.id, section.order)" />
-              <i v-if="index < sections.length - 1" title="Move Down" class="fas fa-chevron-down" @click="moveDown(section.id, section.order)" />
+              <i @click="updateSection(section.id)" :title="'Update ' + section.section + ' Name'" class="fas fa-save" />
+              <i @click="deleteSection(section.id)" :title="'Delete ' + section.section" class="fas fa-trash-alt" />
+              <i v-if="index > 0" :title="'Move ' + section.section + ' Up'" class="fas fa-chevron-up" @click="moveUp(section.id, section.order)" />
+              <i v-if="index < sections.length - 1" :title="'Move ' + section.section + ' Down'" class="fas fa-chevron-down" @click="moveDown(section.id, section.order)" />
             </td>
             <td>
               <input type="text" class="section-name" :value="section.section" :id="'section-' + section.id">

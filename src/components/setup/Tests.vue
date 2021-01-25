@@ -20,8 +20,8 @@
           </tr>
           <tr v-for="(test, index) in tests" :key="index">
             <td>
-              <i @click="updateTest(test.id)" title="Update Test Name" class="fas fa-save" />
-              <i @click="deleteTest(test.id)" title="Delete Test" class="fas fa-trash-alt" />
+              <i @click="updateTest(test.id)" :title="'Update ' + test.test + ' Name'" class="fas fa-save" />
+              <i @click="deleteTest(test.id)" :title="'Delete ' + test.test" class="fas fa-trash-alt" />
             </td>
             <td>
               <input type="text" :value="test.test" :id="'test-' + test.id">

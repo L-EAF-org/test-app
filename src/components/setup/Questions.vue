@@ -60,10 +60,10 @@
             <td class="header">
               <i title="Delete" class="fas fa-trash-alt" @click="deleteQuestion(question.id)" />
 
-              <i v-if="currentQuestionId == question.id" @click="saveQuestion()" title="save" class="fas fa-save" />
-              <i v-if="currentQuestionId != question.id" @click="editQuestion(question)" title="edit" class="fas fa-edit" />
-              <i v-if="index > 0" title="Move Up" class="fas fa-chevron-up" @click="moveUp(question.id, question.order)" />
-              <i v-if="index < questions.length - 1" title="Move Down" class="fas fa-chevron-down" @click="moveDown(question.id, question.order)" />
+              <i v-if="currentQuestionId == question.id" @click="saveQuestion()" title="Save question" class="fas fa-save" />
+              <i v-if="currentQuestionId != question.id" @click="editQuestion(question)" title="Edit question" class="fas fa-edit" />
+              <i v-if="index > 0" title="Move Question Up" class="fas fa-chevron-up" @click="moveUp(question.id, question.order)" />
+              <i v-if="index < questions.length - 1" title="Move Question Down" class="fas fa-chevron-down" @click="moveDown(question.id, question.order)" />
             </td>
             <td>
               <div v-if="currentQuestionId != question.id" class="question-text">
@@ -99,10 +99,10 @@
                   </tr>
                   <tr v-for="(answer, aindex) in question.answers" :key="aindex">
                     <td>
-                      <i title="save" @click="saveAnswer(answer.id)" class="fas fa-save" />
-                      <i title="Delete" class="fas fa-trash-alt" @click="deleteAnswer(answer.id)" />
-                      <i v-if="aindex > 0" title="Move Up" class="fas fa-chevron-up" @click="moveAnswerUp(answer.id, answer.order)" />
-                      <i v-if="aindex < question.answers.length - 1" title="Move Down" class="fas fa-chevron-down" @click="moveAnswerDown(answer.id, answer.order)" />
+                      <i title="Save Answer" @click="saveAnswer(answer.id)" class="fas fa-save" />
+                      <i title="Delete Answer" class="fas fa-trash-alt" @click="deleteAnswer(answer.id)" />
+                      <i v-if="aindex > 0" title="Move Answer Up" class="fas fa-chevron-up" @click="moveAnswerUp(answer.id, answer.order)" />
+                      <i v-if="aindex < question.answers.length - 1" title="Move Answer Down" class="fas fa-chevron-down" @click="moveAnswerDown(answer.id, answer.order)" />
                     </td>
                     <td>
                       <input type="checkbox" :checked="answer.answer" @click="makeAnswer(answer.id)">

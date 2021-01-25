@@ -35,8 +35,8 @@
           </tr>
           <tr v-for="(student, index) in students" :key="index">
             <td>
-              <i @click="updateStudent(student.id)" title="Update Student Name" class="fas fa-save" />
-              <i @click="deleteStudent(student.id)" title="Delete Student" class="fas fa-trash-alt" />
+              <i @click="updateStudent(student.id)" :title="'Update ' + student.student + '\'s Name'" class="fas fa-save" />
+              <i @click="deleteStudent(student.id)" :title="'Delete ' + student.student" class="fas fa-trash-alt" />
             </td>
             <td>
               <input type="text" :value="student.student" :id="'student-' + student.id">
