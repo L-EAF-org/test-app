@@ -20,10 +20,10 @@
           </tr>
           <tr v-for="(organisation, index) in organisations" :key="index">
             <td>
-              <i @click="updateOrganisation(organisation.id)" title="Update Organisation Name" class="fas fa-save" />
-              <i @click="deleteOrganisation(organisation.id)" title="Delete Organisation" class="fas fa-trash-alt" />
-              <i v-if="currentOrganisation.id != organisation.id" @click="updateOrganisationTests(organisation)" title="Update Organisation.organisation Tests" class="fas fa-file-alt" />
-              <i v-if="currentOrganisation.id == organisation.id" @click="updateOrganisationTests('')" title="Close Organisation Tests" class="far fa-file-alt" />
+              <i @click="updateOrganisation(organisation.id)" :title="'Update ' + organisation.organisation + ' Name'" class="fas fa-save" />
+              <i @click="deleteOrganisation(organisation.id)" :title="'Delete ' + organisation.organisation" class="fas fa-trash-alt" />
+              <i v-if="currentOrganisation.id != organisation.id" @click="updateOrganisationTests(organisation)" :title="'Update ' + organisation.organisation + ' Tests'" class="fas fa-clone" />
+              <i v-if="currentOrganisation.id == organisation.id" @click="updateOrganisationTests('')" :title="'Close ' + organisation.organisation + ' Tests'" class="far fa-clone" />
             </td>
             <td>
               <input type="text" :value="organisation.organisation" :id="'organisation-' + organisation.id">

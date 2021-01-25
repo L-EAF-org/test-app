@@ -122,7 +122,7 @@ export default {
     &.left-col {
       vertical-align: top;
     }
-    .fa-edit, .fa-save, .fa-trash-alt, .fa-chevron-up, .fa-chevron-down, .fa-file-alt {
+    .fa-edit, .fa-save, .fa-trash-alt, .fa-chevron-up, .fa-chevron-down, .fa-file-alt, .fa-clone {
       color: #888;
       font-size: x-large;
       margin: 4px;
