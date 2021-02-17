@@ -18,7 +18,7 @@ const Mail = {
     } else {
       $.ajax({
           type: 'GET',
-          url: 'http://agilesimulations.co.uk/mail.php',
+          url: 'https://agilesimulations.co.uk/mail.php',
           data: data,
           success: function() {
             alert(message)

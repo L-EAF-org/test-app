@@ -44,5 +44,5 @@ http://localhost:8097
 "Real" app currently at:
 
 ```
-http://agilesimulations.co.uk/test-app?host
+https://agilesimulations.co.uk/test-app?host
 ```
