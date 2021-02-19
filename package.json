@@ -8,27 +8,27 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "core-js": "^3.6.4",
+    "core-js": "^3.9.0",
     "death": "^1.1.0",
     "jquery": "^3.5.1",
     "mongo": "^0.1.0",
-    "sass": "^1.26.10",
-    "socket.io": "^3.1.0",
-    "socket.io-client": "^3.1.0",
+    "sass": "^1.32.8",
+    "socket.io": "^3.1.1",
+    "socket.io-client": "^3.1.1",
     "uuidv4": "^6.2.6",
     "vue": "^2.6.12",
     "vue-js-modal": "^2.0.0-rc.6",
-    "vuex": "^3.5.1"
+    "vuex": "^3.6.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.3.0",
-    "@vue/cli-plugin-eslint": "~4.3.0",
-    "@vue/cli-service": "~4.3.0",
+    "@vue/cli-plugin-babel": "^4.5.11",
+    "@vue/cli-plugin-eslint": "^4.5.11",
+    "@vue/cli-service": "^4.5.11",
     "babel-eslint": "^10.1.0",
-    "eslint": "^6.8.0",
-    "eslint-plugin-vue": "^6.2.2",
-    "node-sass": "^4.14.1",
-    "sass-loader": "^9.0.3",
+    "eslint": "^7.20.0",
+    "eslint-plugin-vue": "^7.6.0",
+    "node-sass": "^5.0.0",
+    "sass-loader": "^10.1.1",
     "vue-template-compiler": "^2.6.12"
   },
   "eslintConfig": {
