@@ -4,18 +4,10 @@ const os = require('os')
 const prod = os.hostname() == 'agilesimulations' ? true : false
 const logFile = prod ? process.argv[4] : 'server.log'
 
-let currentAction = ''
-let currentData = ''
 ON_DEATH(function(signal, err) {
   let logStr = new Date()
   if (signal) {
     logStr = logStr + ' ' + signal + '\n'
-  }
-  if (currentAction) {
-    logStr = logStr + '  Action: ' + currentAction + '\n'
-  }
-  if (currentData) {
-    logStr = logStr + '  Data: ' + currentData + '\n'
   }
   if (err && err.stack) {
     logStr = logStr + '  Error: ' + err.stack + '\n'
@@ -73,249 +65,114 @@ function emit(event, data) {
   io.emit(event, data)
 }
 
-function doDb(fun, data) {
-  currentAction = fun
-  currentData = data
-  MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
-    if (err) throw err
-    const db = client.db('db')
+MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
+  if (err) throw err
+  const db = client.db('db')
 
-    switch(fun) {
-      case 'loadTestOrganisationStudents':
-        dbStore.loadTestOrganisationStudents(db, io, data, debugOn)
-        break
-      case 'loadStudentTestInstances':
-        dbStore.loadStudentTestInstances(db, io, data, debugOn)
-        break
-      case 'createTestInstance':
-        dbStore.createTestInstance(db, io, data, debugOn)
-        break
-      case 'loadTestInstance':
-        dbStore.loadTestInstance(db, io, data, debugOn)
-        break
-      case 'setAnswer':
-        dbStore.setAnswer(db, io, data, debugOn)
-        break
-
-      case 'loadTestInstances':
-        dbStore.loadTestInstances(db, io, debugOn)
-        break
-      case 'deleteTestInstance':
-        dbStore.deleteTestInstance(db, io, data, debugOn)
-        break
-
-      case 'loadOrganisations':
-        dbStore.loadOrganisations(db, io, debugOn)
-        break
-      case 'loadStudents':
-        dbStore.loadStudents(db, io, data, debugOn)
-        break
-      case 'loadTests':
-        dbStore.loadTests(db, io, debugOn)
-        break
-      case 'loadSections':
-        dbStore.loadSections(db, io, data, debugOn)
-        break
-      case 'loadQuestions':
-        dbStore.loadQuestions(db, io, data, debugOn)
-        break
-
-      case 'addOrganisation':
-        dbStore.addOrganisation(db, io, data, debugOn)
-        break
-      case 'updateOrganisation':
-        dbStore.updateOrganisation(db, io, data, debugOn)
-        break
-      case 'setOrganisationTest':
-        dbStore.setOrganisationTest(db, io, data, debugOn)
-        break
-      case 'deleteOrganisation':
-        dbStore.deleteOrganisation(db, io, data, debugOn)
-        break
-      case 'addStudent':
-        dbStore.addStudent(db, io, data, debugOn)
-        break
-      case 'updateStudent':
-        dbStore.updateStudent(db, io, data, debugOn)
-        break
-      case 'deleteStudent':
-        dbStore.deleteStudent(db, io, data, debugOn)
-        break
-      case 'addTest':
-        dbStore.addTest(db, io, data, debugOn)
-        break
-      case 'updateTest':
-        dbStore.updateTest(db, io, data, debugOn)
-        break
-      case 'deleteTest':
-        dbStore.deleteTest(db, io, data, debugOn)
-        break
-      case 'addSection':
-        dbStore.addSection(db, io, data, debugOn)
-        break
-      case 'updateSection':
-        dbStore.updateSection(db, io, data, debugOn)
-        break
-      case 'updateSectionQuestionsToShow':
-        dbStore.updateSectionQuestionsToShow(db, io, data, debugOn)
-        break
-      case 'deleteSection':
-        dbStore.deleteSection(db, io, data, debugOn)
-        break
-      case 'moveSectionUp':
-        dbStore.moveSectionUp(db, io, data, debugOn)
-        break
-      case 'moveSectionDown':
-        dbStore.moveSectionDown(db, io, data, debugOn)
-        break
-      case 'addQuestion':
-        dbStore.addQuestion(db, io, data, debugOn)
-        break
-      case 'deleteQuestion':
-        dbStore.deleteQuestion(db, io, data, debugOn)
-        break
-      case 'moveQuestionUp':
-        dbStore.moveQuestionUp(db, io, data, debugOn)
-        break
-      case 'moveQuestionDown':
-        dbStore.moveQuestionDown(db, io, data, debugOn)
-        break
-      case 'addAnswer':
-        dbStore.addAnswer(db, io, data, debugOn)
-        break
-      case 'saveAnswer':
-        dbStore.saveAnswer(db, io, data, debugOn)
-        break
-      case 'makeAnswer':
-        dbStore.makeAnswer(db, io, data, debugOn)
-        break
-      case 'makeTrueFalseAnswer':
-        dbStore.makeTrueFalseAnswer(db, io, data, debugOn)
-        break
-      case 'deleteAnswer':
-        dbStore.deleteAnswer(db, io, data, debugOn)
-        break
-      case 'moveAnswerUp':
-        dbStore.moveAnswerUp(db, io, data, debugOn)
-        break
-      case 'moveAnswerDown':
-        dbStore.moveAnswerDown(db, io, data, debugOn)
-        break
-      case 'saveQuestionType':
-        dbStore.saveQuestionType(db, io, data, debugOn)
-        break
-      case 'saveQuestionQuestion':
-        dbStore.saveQuestionQuestion(db, io, data, debugOn)
-        break
+  io.on('connection', (socket) => {
+    connections = connections + 1
+    if (connections > maxConnections) {
+      console.log(`Too many connections. Socket ${socket.id} closed`)
+      socket.disconnect(0)
+    } else {
+      connectDebugOff || console.log(`A user connected with socket id ${socket.id}. (${connections} connections)`)
+      emit('updateConnections', {connections: connections, maxConnections: maxConnections})
     }
+
+    socket.on('disconnect', () => {
+      connections = connections - 1
+      connectDebugOff || console.log(`User with socket id ${socket.id} has disconnected. (${connections} connections)`)
+      emit('updateConnections', {connections: connections, maxConnections: maxConnections})
+    })
+
+    // Test
+
+    socket.on('loadTestOrganisationStudents', (data) => { dbStore.loadTestOrganisationStudents(db, io, data, debugOn) })
+
+    socket.on('loadStudentTestInstances', (data) => { dbStore.loadStudentTestInstances(db, io, data, debugOn) })
+
+    socket.on('createTestInstance', (data) => { dbStore.createTestInstance(db, io, data, debugOn) })
+
+    socket.on('loadTestInstance', (data) => { dbStore.loadTestInstance(db, io, data, debugOn) })
+
+    socket.on('setAnswer', (data) => { dbStore.setAnswer(db, io, data, debugOn) })
+
+    // Results
+
+    socket.on('loadTestInstances', () => { dbStore.loadTestInstances(db, io, debugOn) })
+
+    socket.on('deleteTestInstance', (data) => { dbStore.deleteTestInstance(db, io, data, debugOn) })
+
+    // Facilitator
+
+    socket.on('loadOrganisations', () => { dbStore.loadOrganisations(db, io, debugOn) })
+
+    socket.on('loadStudents', (data) => { dbStore.loadStudents(db, io, data, debugOn) })
+
+    socket.on('loadTests', () => { dbStore.loadTests(db, io, debugOn) })
+
+    socket.on('loadSections', (data) => { dbStore.loadSections(db, io, data, debugOn) })
+
+    socket.on('loadQuestions', (data) => { dbStore.loadQuestions(db, io, data, debugOn) })
+
+    socket.on('addOrganisation', (data) => { dbStore.addOrganisation(db, io, data, debugOn) })
+
+    socket.on('updateOrganisation', (data) => { dbStore.updateOrganisation(db, io, data, debugOn) })
+
+    socket.on('setOrganisationTest', (data) => { dbStore.setOrganisationTest(db, io, data, debugOn) })
+
+    socket.on('deleteOrganisation', (data) => { dbStore.deleteOrganisation(db, io, data, debugOn) })
+
+    socket.on('addStudent', (data) => { dbStore.addStudent(db, io, data, debugOn) })
+
+    socket.on('updateStudent', (data) => { dbStore.updateStudent(db, io, data, debugOn) })
+
+    socket.on('deleteStudent', (data) => { dbStore.deleteStudent(db, io, data, debugOn) })
+
+    socket.on('addTest', (data) => { dbStore.addTest(db, io, data, debugOn) })
+
+    socket.on('updateTest', (data) => { dbStore.updateTest(db, io, data, debugOn) })
+
+    socket.on('deleteTest', (data) => { dbStore.deleteTest(db, io, data, debugOn) })
+
+    socket.on('addSection', (data) => { dbStore.addSection(db, io, data, debugOn) })
+
+    socket.on('updateSection', (data) => { dbStore.updateSection(db, io, data, debugOn) })
+
+    socket.on('updateSectionQuestionsToShow', (data) => { dbStore.updateSectionQuestionsToShow(db, io, data, debugOn) })
+
+    socket.on('deleteSection', (data) => { dbStore.deleteSection(db, io, data, debugOn) })
+
+    socket.on('moveSectionUp', (data) => { dbStore.moveSectionUp(db, io, data, debugOn) })
+
+    socket.on('moveSectionDown', (data) => { dbStore.moveSectionDown(db, io, data, debugOn) })
+
+    socket.on('addQuestion', (data) => { dbStore.addQuestion(db, io, data, debugOn) })
+
+    socket.on('deleteQuestion', (data) => { dbStore.deleteQuestion(db, io, data, debugOn) })
+
+    socket.on('moveQuestionUp', (data) => { dbStore.moveQuestionUp(db, io, data, debugOn) })
+
+    socket.on('moveQuestionDown', (data) => { dbStore.moveQuestionDown(db, io, data, debugOn) })
+
+    socket.on('addAnswer', (data) => { dbStore.addAnswer(db, io, data, debugOn) })
+
+    socket.on('saveAnswer', (data) => { dbStore.addAnswer(db, io, data, debugOn) })
+
+    socket.on('makeAnswer', (data) => { dbStore.makeAnswer(db, io, data, debugOn) })
+
+    socket.on('makeTrueFalseAnswer', (data) => { dbStore.makeTrueFalseAnswer(db, io, data, debugOn) })
+
+    socket.on('deleteAnswer', (data) => { dbStore.deleteAnswer(db, io, data, debugOn) })
+
+    socket.on('moveAnswerUp', (data) => { dbStore.moveAnswerUp(db, io, data, debugOn) })
+
+    socket.on('moveAnswerDown', (data) => { dbStore.moveAnswerDown(db, io, data, debugOn) })
+
+    socket.on('saveQuestionType', (data) => { dbStore.saveQuestionType(db, io, data, debugOn) })
+
+    socket.on('saveQuestionQuestion', (data) => { dbStore.saveQuestionQuestion(db, io, data, debugOn) })
   })
-}
-io.on('connection', (socket) => {
-  connections = connections + 1
-  if (connections > maxConnections) {
-    console.log(`Too many connections. Socket ${socket.id} closed`)
-    socket.disconnect(0)
-  } else {
-    connectDebugOff || console.log(`A user connected with socket id ${socket.id}. (${connections} connections)`)
-    emit('updateConnections', {connections: connections, maxConnections: maxConnections})
-  }
-
-  socket.on('disconnect', () => {
-    connections = connections - 1
-    connectDebugOff || console.log(`User with socket id ${socket.id} has disconnected. (${connections} connections)`)
-    emit('updateConnections', {connections: connections, maxConnections: maxConnections})
-  })
-
-  // Test
-
-  socket.on('loadTestOrganisationStudents', (data) => { doDb('loadTestOrganisationStudents', data) })
-
-  socket.on('loadStudentTestInstances', (data) => { doDb('loadStudentTestInstances', data) })
-
-  //socket.on('loadTest', (data) => { doDb('loadTest', data) })
-
-  socket.on('createTestInstance', (data) => { doDb('createTestInstance', data) })
-
-  socket.on('loadTestInstance', (data) => { doDb('loadTestInstance', data) })
-
-  socket.on('setAnswer', (data) => { doDb('setAnswer', data) })
-
-  // Results
-
-  socket.on('loadTestInstances', () => { doDb('loadTestInstances') })
-
-  socket.on('deleteTestInstance', (data) => { doDb('deleteTestInstance', data) })
-
-  // Facilitator
-
-  socket.on('loadOrganisations', () => { doDb('loadOrganisations') })
-
-  socket.on('loadStudents', (data) => { doDb('loadStudents', data) })
-
-  socket.on('loadTests', () => { doDb('loadTests') })
-
-  socket.on('loadSections', (data) => { doDb('loadSections', data) })
-
-  socket.on('loadQuestions', (data) => { doDb('loadQuestions', data) })
-
-  socket.on('addOrganisation', (data) => { doDb('addOrganisation', data) })
-
-  socket.on('updateOrganisation', (data) => { doDb('updateOrganisation', data) })
-
-  socket.on('setOrganisationTest', (data) => { doDb('setOrganisationTest', data) })
-
-  socket.on('deleteOrganisation', (data) => { doDb('deleteOrganisation', data) })
-
-  socket.on('addStudent', (data) => { doDb('addStudent', data) })
-
-  socket.on('updateStudent', (data) => { doDb('updateStudent', data) })
-
-  socket.on('deleteStudent', (data) => { doDb('deleteStudent', data) })
-
-  socket.on('addTest', (data) => { doDb('addTest', data) })
-
-  socket.on('updateTest', (data) => { doDb('updateTest', data) })
-
-  socket.on('deleteTest', (data) => { doDb('deleteTest', data) })
-
-  socket.on('addSection', (data) => { doDb('addSection', data) })
-
-  socket.on('updateSection', (data) => { doDb('updateSection', data) })
-
-  socket.on('updateSectionQuestionsToShow', (data) => { doDb('updateSectionQuestionsToShow', data) })
-
-  socket.on('deleteSection', (data) => { doDb('deleteSection', data) })
-
-  socket.on('moveSectionUp', (data) => { doDb('moveSectionUp', data) })
-
-  socket.on('moveSectionDown', (data) => { doDb('moveSectionDown', data) })
-
-  socket.on('addQuestion', (data) => { doDb('addQuestion', data) })
-
-  socket.on('deleteQuestion', (data) => { doDb('deleteQuestion', data) })
-
-  socket.on('moveQuestionUp', (data) => { doDb('moveQuestionUp', data) })
-
-  socket.on('moveQuestionDown', (data) => { doDb('moveQuestionDown', data) })
-
-  socket.on('addAnswer', (data) => { doDb('addAnswer', data) })
-
-  socket.on('saveAnswer', (data) => { doDb('saveAnswer', data) })
-
-  socket.on('makeAnswer', (data) => { doDb('makeAnswer', data) })
-
-  socket.on('makeTrueFalseAnswer', (data) => { doDb('makeTrueFalseAnswer', data) })
-
-  socket.on('deleteAnswer', (data) => { doDb('deleteAnswer', data) })
-
-  socket.on('moveAnswerUp', (data) => { doDb('moveAnswerUp', data) })
-
-  socket.on('moveAnswerDown', (data) => { doDb('moveAnswerDown', data) })
-
-  socket.on('saveQuestionType', (data) => { doDb('saveQuestionType', data) })
-
-  socket.on('saveQuestionQuestion', (data) => { doDb('saveQuestionQuestion', data) })
-
 })
 
 const port = process.argv[2] || 3015
