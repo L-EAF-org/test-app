@@ -102,6 +102,8 @@
 <script>
 const { v4: uuidv4 } = require('uuid')
 
+import bus from '../socket.js'
+
 import dateTime from '../lib/dateTime.js'
 
 import Score from './test/Score.vue'
@@ -110,9 +112,6 @@ export default {
   components: {
     Score
   },
-  props: [
-    'socket'
-  ],
   data() {
     return {
       tests: [],
@@ -141,19 +140,19 @@ export default {
   created() {
     const self = this
 
-    this.socket.on('loadTestOrganisationStudents', (data) => {
+    bus.$on('loadTestOrganisationStudents', (data) => {
       if (data.organisationId == self.organisationId) {
         self.students = data.students
       }
     })
 
-    this.socket.on('loadStudentTestInstances', (data) => {
+    bus.$on('loadStudentTestInstances', (data) => {
       if (data.organisationId == this.organisationId && data.testId == self.test.id && data.studentId == self.student.id) {
         self.testInstances = data.testInstances
       }
     })
 
-    this.socket.on('loadTestInstance', (data) => {
+    bus.$on('loadTestInstance', (data) => {
       if (self.testInstance.id == data.id) {
         self.$store.dispatch('updateTestInstance', data)
       }
@@ -182,7 +181,7 @@ export default {
           }
         }
         this.organisationId = id
-        this.socket.emit('loadTestOrganisationStudents', {organisationId: id})
+        bus.$emit('sendLoadTestOrganisationStudents', {organisationId: id})
       } else {
         this.tests = []
         this.students = []
@@ -206,7 +205,7 @@ export default {
         const index = document.getElementById('test-student').options.selectedIndex
         const student = document.getElementById('test-student').options[index].text
         this.student = {id: id, student: student}
-        this.socket.emit('loadStudentTestInstances', {organisationId: this.organisationId, testId: this.test.id, studentId: id})
+        bus.$emit('sendLoadStudentTestInstances', {organisationId: this.organisationId, testId: this.test.id, studentId: id})
       } else {
         this.student = {id: '', student: null}
       }
@@ -215,21 +214,21 @@ export default {
       if (this.organisationId && this.test.id && this.student.id) {
         const id = uuidv4()
         this.$store.dispatch('updateTestInstance', {id: id})
-        this.socket.emit('createTestInstance', {id: id, organisationId: this.organisationId, testId: this.test.id, studentId: this.student.id})
+        bus.$emit('sendCreateTestInstance', {id: id, organisationId: this.organisationId, testId: this.test.id, studentId: this.student.id})
       }
     },
     loadTestInstance() {
       const id = document.getElementById('test-instance').value
       if (id) {
         this.$store.dispatch('updateTestInstance', {id: id})
-        this.socket.emit('loadTestInstance', {id: id})
+        bus.$emit('sendLoadTestInstance', {id: id})
       } else {
         this.testInstanceId = null
       }
     },
     setAnswer(question, answer) {
       const val = document.getElementById('answer-' + answer.id).checked
-      this.socket.emit('setAnswer', {testInstanceId: this.testInstance.id, questionId: question.id, answerId: answer.id, value: val})
+      bus.$emit('sendSetAnswer', {testInstanceId: this.testInstance.id, questionId: question.id, answerId: answer.id, value: val})
     },
     setMultipleAnswer(question) {
       const values = document.getElementsByName('answer-' + question.id)
@@ -240,17 +239,17 @@ export default {
           value: values[i].checked
         })
       }
-      this.socket.emit('setAnswer', {testInstanceId: this.testInstance.id, questionId: question.id, answerId: null, value: answers})
+      bus.$emit('sendSetAnswer', {testInstanceId: this.testInstance.id, questionId: question.id, answerId: null, value: answers})
     },
     setTrue(question) {
       document.getElementById('question-true-' + question.id).checked = true
       document.getElementById('question-false-' + question.id).checked = false
-      this.socket.emit('setAnswer', {testInstanceId: this.testInstance.id, questionId: question.id, value: true})
+      bus.$emit('sendSetAnswer', {testInstanceId: this.testInstance.id, questionId: question.id, value: true})
     },
     setFalse(question) {
       document.getElementById('question-false-' + question.id).checked = true
       document.getElementById('question-true-' + question.id).checked = false
-      this.socket.emit('setAnswer', {testInstanceId: this.testInstance.id, questionId: question.id, value: false})
+      bus.$emit('sendSetAnswer', {testInstanceId: this.testInstance.id, questionId: question.id, value: false})
     },
     submitTest() {
       console.log('submit')

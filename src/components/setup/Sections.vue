@@ -54,10 +54,9 @@
 </template>
 
 <script>
+import bus from '../../socket.js'
+
 export default {
-  props: [
-    'socket'
-  ],
   data() {
     return {
       showTestSections: false,
@@ -78,14 +77,14 @@ export default {
     },
     loadSections() {
       this.currentTest = document.getElementById('sections-test').value
-      this.socket.emit('loadSections', {testId: this.currentTest})
+      bus.$emit('sendLoadSections', {testId: this.currentTest})
     },
     addSection() {
       const section = document.getElementById('new-section').value
       if (!section) {
         alert('Please enter a value')
       } else {
-        this.socket.emit('addSection', {testId: this.currentTest, section: section})
+        bus.$emit('sendAddSection', {testId: this.currentTest, section: section})
         document.getElementById('new-section').value = ''
       }
     },
@@ -94,22 +93,22 @@ export default {
       if (!section) {
         alert('Please enter a value')
       } else {
-        this.socket.emit('updateSection', {testId: this.currentTest, sectionId: id, section: section})
+        bus.$emit('sendUpdateSection', {testId: this.currentTest, sectionId: id, section: section})
       }
     },
     questionsToShow(id) {
       const n = document.getElementById('section-questions-' + id).value
-      this.socket.emit('updateSectionQuestionsToShow', {id: id, questionsToShow: n})
+      bus.$emit('sendUpdateSectionQuestionsToShow', {id: id, questionsToShow: n})
 
     },
     moveUp(id, order) {
-      this.socket.emit('moveSectionUp', {testId: this.currentTest, sectionId: id, order: order})
+      bus.$emit('sendMoveSectionUp', {testId: this.currentTest, sectionId: id, order: order})
     },
     moveDown(id, order) {
-      this.socket.emit('moveSectionDown', {testId: this.currentTest, sectionId: id, order: order})
+      bus.$emit('sendMoveSectionDown', {testId: this.currentTest, sectionId: id, order: order})
     },
     deleteSection(id) {
-      this.socket.emit('deleteSection', {testId: this.currentTest, sectionId: id})
+      bus.$emit('sendDeleteSection', {testId: this.currentTest, sectionId: id})
     }
   }
 }

@@ -46,10 +46,9 @@
 </template>
 
 <script>
+import bus from '../../socket.js'
+
 export default {
-  props: [
-    'socket'
-  ],
   data() {
     return {
       showTestOrganisations: false,
@@ -73,7 +72,7 @@ export default {
       if (!organisation) {
         alert('Please enter a value')
       } else {
-        this.socket.emit('addOrganisation', {organisation: organisation})
+        bus.$emit('sendAddOrganisation', {organisation: organisation})
         document.getElementById('new-organisation').value = ''
       }
     },
@@ -82,7 +81,7 @@ export default {
       if (!organisation) {
         alert('Please enter a value')
       } else {
-        this.socket.emit('updateOrganisation', {organisationId: id, organisation: organisation})
+        bus.$emit('sendUpdateOrganisation', {organisationId: id, organisation: organisation})
       }
     },
     updateOrganisationTests(organisation) {
@@ -90,13 +89,13 @@ export default {
     },
     setOrganisationTest(id, test) {
       const val = document.getElementById('organisation-test-' + id).checked
-      this.socket.emit('setOrganisationTest', {organisationId: this.currentOrganisation.id, testId: id, test: test, value: val})
+      bus.$emit('sendSetOrganisationTest', {organisationId: this.currentOrganisation.id, testId: id, test: test, value: val})
     },
     organisationTest(organisation, id) {
       return organisation.tests && organisation.tests[id] ? organisation.tests[id].value : false
     },
     deleteOrganisation(id) {
-      this.socket.emit('deleteOrganisation', {organisationId: id})
+      bus.$emit('sendDeleteOrganisation', {organisationId: id})
     }
   }
 }

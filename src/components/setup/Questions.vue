@@ -135,10 +135,9 @@
 </template>
 
 <script>
+import bus from '../../socket.js'
+
 export default {
-  props: [
-    'socket'
-  ],
   data() {
     return {
       showTestQuestions: false,
@@ -167,41 +166,41 @@ export default {
     },
     loadSections() {
       this.currentTest = document.getElementById('test').value
-      this.socket.emit('loadSections', {testId: this.currentTest})
+      bus.$emit('sendLoadSections', {testId: this.currentTest})
     },
     loadQuestions() {
       this.currentSection = document.getElementById('section').value
-      this.socket.emit('loadQuestions', {testId: this.currentTest, sectionId: this.currentSection})
+      bus.$emit('sendLoadQuestions', {testId: this.currentTest, sectionId: this.currentSection})
     },
     addQuestion() {
       const question = document.getElementById('new-question').value
       if (!question) {
         alert('Please enter a value')
       } else {
-        this.socket.emit('addQuestion', {testId: this.currentTest, sectionId: this.currentSection, question: question})
+        bus.$emit('sendAddQuestion', {testId: this.currentTest, sectionId: this.currentSection, question: question})
         document.getElementById('new-question').value = ''
       }
     },
     deleteQuestion(id) {
-      this.socket.emit('deleteQuestion', {testId: this.currentTest, sectionId: this.currentSection, id: id})
+      bus.$emit('sendDeleteQuestion', {testId: this.currentTest, sectionId: this.currentSection, id: id})
     },
     moveUp(id, order) {
-      this.socket.emit('moveQuestionUp', {testId: this.currentTest, sectionId: this.currentSection, questionId: id, order: order})
+      bus.$emit('sendMoveQuestionUp', {testId: this.currentTest, sectionId: this.currentSection, questionId: id, order: order})
     },
     moveDown(id, order) {
-      this.socket.emit('moveQuestionDown', {testId: this.currentTest, sectionId: this.currentSection, questionId: id, order: order})
+      bus.$emit('sendMoveQuestionDown', {testId: this.currentTest, sectionId: this.currentSection, questionId: id, order: order})
     },
     saveQuestionType() {
       const multiple = document.getElementById('question-type-multiple-' + this.currentQuestionId).checked
       const trueFalse = document.getElementById('question-type-true-false-' + this.currentQuestionId).checked
-      this.socket.emit('saveQuestionType', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, multiple: multiple, trueFalse: trueFalse})
+      bus.$emit('sendSaveQuestionType', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, multiple: multiple, trueFalse: trueFalse})
     },
     saveQuestion() {
       const question = document.getElementById('question-' + this.currentQuestionId).value
       if (!question) {
         alert('Please enter a value')
       } else {
-        this.socket.emit('saveQuestionQuestion', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, question: question})
+        bus.$emit('sendSaveQuestionQuestion', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, question: question})
         this.currentQuestionId = ''
       }
     },
@@ -210,7 +209,7 @@ export default {
       if (!answer) {
         alert('Please enter a value')
       } else {
-        this.socket.emit('addAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, answer: answer})
+        bus.$emit('sendAddAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, answer: answer})
         document.getElementById('new-answer').value = ''
       }
     },
@@ -219,23 +218,23 @@ export default {
       if (!answer) {
         alert('Please enter a value')
       } else {
-        this.socket.emit('saveAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id, value: answer})
+        bus.$emit('sendSaveAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id, value: answer})
       }
     },
     makeAnswer(answerId) {
-      this.socket.emit('makeAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, answerId: answerId})
+      bus.$emit('sendMakeAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, answerId: answerId})
     },
     moveAnswerUp(id, order) {
-      this.socket.emit('moveAnswerUp', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id, order: order})
+      bus.$emit('sendMoveAnswerUp', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id, order: order})
     },
     moveAnswerDown(id, order) {
-      this.socket.emit('moveAnswerDown', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id, order: order})
+      bus.$emit('sendMoveAnswerDown', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id, order: order})
     },
     deleteAnswer(id) {
-      this.socket.emit('deleteAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id})
+      bus.$emit('sendDeleteAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id})
     },
     setTrueFalseAnswer(questionId, val) {
-      this.socket.emit('makeTrueFalseAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, val: val})
+      bus.$emit('sendMakeTrueFalseAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, val: val})
     },
 
   }

@@ -49,10 +49,9 @@
 </template>
 
 <script>
+import bus from '../../socket.js'
+
 export default {
-  props: [
-    'socket'
-  ],
   data() {
     return {
       showTestStudents: false,
@@ -73,14 +72,14 @@ export default {
     },
     loadStudents() {
       this.currentOrganisation = document.getElementById('student-organisations').value
-      this.socket.emit('loadStudents', {organisationId: this.currentOrganisation})
+      bus.$emit('sendLoadStudents', {organisationId: this.currentOrganisation})
     },
     addStudent() {
       const student = document.getElementById('new-student').value
       if (!student) {
         alert('Please enter a value')
       } else {
-        this.socket.emit('addStudent', {organisationId: this.currentOrganisation, student: student})
+        bus.$emit('sendAddStudent', {organisationId: this.currentOrganisation, student: student})
         document.getElementById('new-student').value = ''
       }
     },
@@ -89,11 +88,11 @@ export default {
       if (!student) {
         alert('Please enter a value')
       } else {
-        this.socket.emit('updateStudent', {organisationId: this.currentOrganisation, studentId: id, student: student})
+        bus.$emit('sendUpdateStudent', {organisationId: this.currentOrganisation, studentId: id, student: student})
       }
     },
     deleteStudent(id) {
-      this.socket.emit('deleteStudent', {organisationId: this.currentOrganisation, studentId: id})
+      bus.$emit('sendDeleteStudent', {organisationId: this.currentOrganisation, studentId: id})
     }
   }
 }

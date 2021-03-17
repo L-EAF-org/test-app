@@ -87,87 +87,87 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
 
     // Test
 
-    socket.on('loadTestOrganisationStudents', (data) => { dbStore.loadTestOrganisationStudents(db, io, data, debugOn) })
+    socket.on('sendLoadTestOrganisationStudents', (data) => { dbStore.loadTestOrganisationStudents(db, io, data, debugOn) })
 
-    socket.on('loadStudentTestInstances', (data) => { dbStore.loadStudentTestInstances(db, io, data, debugOn) })
+    socket.on('sendLoadStudentTestInstances', (data) => { dbStore.loadStudentTestInstances(db, io, data, debugOn) })
 
-    socket.on('createTestInstance', (data) => { dbStore.createTestInstance(db, io, data, debugOn) })
+    socket.on('sendCreateTestInstance', (data) => { dbStore.createTestInstance(db, io, data, debugOn) })
 
-    socket.on('loadTestInstance', (data) => { dbStore.loadTestInstance(db, io, data, debugOn) })
+    socket.on('sendLoadTestInstance', (data) => { dbStore.loadTestInstance(db, io, data, debugOn) })
 
-    socket.on('setAnswer', (data) => { dbStore.setAnswer(db, io, data, debugOn) })
+    socket.on('sendSetAnswer', (data) => { dbStore.setAnswer(db, io, data, debugOn) })
 
     // Results
 
-    socket.on('loadTestInstances', () => { dbStore.loadTestInstances(db, io, debugOn) })
+    socket.on('sendLoadTestInstances', () => { dbStore.loadTestInstances(db, io, debugOn) })
 
-    socket.on('deleteTestInstance', (data) => { dbStore.deleteTestInstance(db, io, data, debugOn) })
+    socket.on('sendDeleteTestInstance', (data) => { dbStore.deleteTestInstance(db, io, data, debugOn) })
 
     // Facilitator
 
-    socket.on('loadOrganisations', () => { dbStore.loadOrganisations(db, io, debugOn) })
+    socket.on('sendLoadOrganisations', () => { dbStore.loadOrganisations(db, io, debugOn) })
 
-    socket.on('loadStudents', (data) => { dbStore.loadStudents(db, io, data, debugOn) })
+    socket.on('sendLoadStudents', (data) => { dbStore.loadStudents(db, io, data, debugOn) })
 
-    socket.on('loadTests', () => { dbStore.loadTests(db, io, debugOn) })
+    socket.on('sendLoadTests', () => { dbStore.loadTests(db, io, debugOn) })
 
-    socket.on('loadSections', (data) => { dbStore.loadSections(db, io, data, debugOn) })
+    socket.on('sendLoadSections', (data) => { dbStore.loadSections(db, io, data, debugOn) })
 
-    socket.on('loadQuestions', (data) => { dbStore.loadQuestions(db, io, data, debugOn) })
+    socket.on('sendLoadQuestions', (data) => { dbStore.loadQuestions(db, io, data, debugOn) })
 
-    socket.on('addOrganisation', (data) => { dbStore.addOrganisation(db, io, data, debugOn) })
+    socket.on('sendAddOrganisation', (data) => { dbStore.addOrganisation(db, io, data, debugOn) })
 
-    socket.on('updateOrganisation', (data) => { dbStore.updateOrganisation(db, io, data, debugOn) })
+    socket.on('sendUpdateOrganisation', (data) => { dbStore.updateOrganisation(db, io, data, debugOn) })
 
-    socket.on('setOrganisationTest', (data) => { dbStore.setOrganisationTest(db, io, data, debugOn) })
+    socket.on('sendSetOrganisationTest', (data) => { dbStore.setOrganisationTest(db, io, data, debugOn) })
 
-    socket.on('deleteOrganisation', (data) => { dbStore.deleteOrganisation(db, io, data, debugOn) })
+    socket.on('sendDeleteOrganisation', (data) => { dbStore.deleteOrganisation(db, io, data, debugOn) })
 
-    socket.on('addStudent', (data) => { dbStore.addStudent(db, io, data, debugOn) })
+    socket.on('sendAddStudent', (data) => { dbStore.addStudent(db, io, data, debugOn) })
 
-    socket.on('updateStudent', (data) => { dbStore.updateStudent(db, io, data, debugOn) })
+    socket.on('sendUpdateStudent', (data) => { dbStore.updateStudent(db, io, data, debugOn) })
 
-    socket.on('deleteStudent', (data) => { dbStore.deleteStudent(db, io, data, debugOn) })
+    socket.on('sendDeleteStudent', (data) => { dbStore.deleteStudent(db, io, data, debugOn) })
 
-    socket.on('addTest', (data) => { dbStore.addTest(db, io, data, debugOn) })
+    socket.on('sendAddTest', (data) => { dbStore.addTest(db, io, data, debugOn) })
 
-    socket.on('updateTest', (data) => { dbStore.updateTest(db, io, data, debugOn) })
+    socket.on('sendUpdateTest', (data) => { dbStore.updateTest(db, io, data, debugOn) })
 
-    socket.on('deleteTest', (data) => { dbStore.deleteTest(db, io, data, debugOn) })
+    socket.on('sendDeleteTest', (data) => { dbStore.deleteTest(db, io, data, debugOn) })
 
-    socket.on('addSection', (data) => { dbStore.addSection(db, io, data, debugOn) })
+    socket.on('sendAddSection', (data) => { dbStore.addSection(db, io, data, debugOn) })
 
-    socket.on('updateSection', (data) => { dbStore.updateSection(db, io, data, debugOn) })
+    socket.on('sendUpdateSection', (data) => { dbStore.updateSection(db, io, data, debugOn) })
 
-    socket.on('updateSectionQuestionsToShow', (data) => { dbStore.updateSectionQuestionsToShow(db, io, data, debugOn) })
+    socket.on('sendUpdateSectionQuestionsToShow', (data) => { dbStore.updateSectionQuestionsToShow(db, io, data, debugOn) })
 
-    socket.on('deleteSection', (data) => { dbStore.deleteSection(db, io, data, debugOn) })
+    socket.on('sendDeleteSection', (data) => { dbStore.deleteSection(db, io, data, debugOn) })
 
-    socket.on('moveSectionUp', (data) => { dbStore.moveSectionUp(db, io, data, debugOn) })
+    socket.on('sendMoveSectionUp', (data) => { dbStore.moveSectionUp(db, io, data, debugOn) })
 
-    socket.on('moveSectionDown', (data) => { dbStore.moveSectionDown(db, io, data, debugOn) })
+    socket.on('sendMoveSectionDown', (data) => { dbStore.moveSectionDown(db, io, data, debugOn) })
 
-    socket.on('addQuestion', (data) => { dbStore.addQuestion(db, io, data, debugOn) })
+    socket.on('sendAddQuestion', (data) => { dbStore.addQuestion(db, io, data, debugOn) })
 
-    socket.on('deleteQuestion', (data) => { dbStore.deleteQuestion(db, io, data, debugOn) })
+    socket.on('sendDeleteQuestion', (data) => { dbStore.deleteQuestion(db, io, data, debugOn) })
 
-    socket.on('moveQuestionUp', (data) => { dbStore.moveQuestionUp(db, io, data, debugOn) })
+    socket.on('sendMoveQuestionUp', (data) => { dbStore.moveQuestionUp(db, io, data, debugOn) })
 
-    socket.on('moveQuestionDown', (data) => { dbStore.moveQuestionDown(db, io, data, debugOn) })
+    socket.on('sendMoveQuestionDown', (data) => { dbStore.moveQuestionDown(db, io, data, debugOn) })
 
-    socket.on('addAnswer', (data) => { dbStore.addAnswer(db, io, data, debugOn) })
+    socket.on('sendAddAnswer', (data) => { dbStore.addAnswer(db, io, data, debugOn) })
 
-    socket.on('saveAnswer', (data) => { dbStore.addAnswer(db, io, data, debugOn) })
+    socket.on('sendSaveAnswer', (data) => { dbStore.addAnswer(db, io, data, debugOn) })
 
-    socket.on('makeAnswer', (data) => { dbStore.makeAnswer(db, io, data, debugOn) })
+    socket.on('sendMakeAnswer', (data) => { dbStore.makeAnswer(db, io, data, debugOn) })
 
-    socket.on('makeTrueFalseAnswer', (data) => { dbStore.makeTrueFalseAnswer(db, io, data, debugOn) })
+    socket.on('sendMakeTrueFalseAnswer', (data) => { dbStore.makeTrueFalseAnswer(db, io, data, debugOn) })
 
-    socket.on('deleteAnswer', (data) => { dbStore.deleteAnswer(db, io, data, debugOn) })
+    socket.on('sendDeleteAnswer', (data) => { dbStore.deleteAnswer(db, io, data, debugOn) })
 
-    socket.on('moveAnswerUp', (data) => { dbStore.moveAnswerUp(db, io, data, debugOn) })
+    socket.on('sendMoveAnswerUp', (data) => { dbStore.moveAnswerUp(db, io, data, debugOn) })
 
-    socket.on('moveAnswerDown', (data) => { dbStore.moveAnswerDown(db, io, data, debugOn) })
+    socket.on('sendMoveAnswerDown', (data) => { dbStore.moveAnswerDown(db, io, data, debugOn) })
 
     socket.on('saveQuestionType', (data) => { dbStore.saveQuestionType(db, io, data, debugOn) })
 

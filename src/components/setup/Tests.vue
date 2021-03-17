@@ -34,10 +34,9 @@
 </template>
 
 <script>
+import bus from '../../socket.js'
+
 export default {
-  props: [
-    'socket'
-  ],
   data() {
     return {
       showTestTests: false
@@ -57,7 +56,7 @@ export default {
       if (!test) {
         alert('Please enter a value')
       } else {
-        this.socket.emit('addTest', {test: test})
+        bus.$emit('sendAddTest', {test: test})
         document.getElementById('new-test').value = ''
       }
     },
@@ -66,11 +65,11 @@ export default {
       if (!test) {
         alert('Please enter a value')
       } else {
-        this.socket.emit('updateTest', {testId: id, test: test})
+        bus.$emit('sendUpdateTest', {testId: id, test: test})
       }
     },
     deleteTest(id) {
-      this.socket.emit('deleteTest', {testId: id})
+      bus.$emit('sendDeleteTest', {testId: id})
     }
   }
 }

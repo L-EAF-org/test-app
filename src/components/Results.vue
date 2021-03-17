@@ -71,12 +71,11 @@
 </template>
 
 <script>
+import bus from '../socket.js'
+
 import dateTime from '../lib/dateTime.js'
 
 export default {
-  props: [
-    'socket'
-  ],
   data() {
     return {
       testInstances: [],
@@ -86,7 +85,7 @@ export default {
   created() {
     const self = this
 
-    this.socket.on('loadTestInstances', (data) => {
+    bus.$on('loadTestInstances', (data) => {
       self.testInstances = data
     })
   },
@@ -111,10 +110,10 @@ export default {
       this.details = null
     },
     loadTestInstances() {
-      this.socket.emit('loadTestInstances')
+      bus.$emit('sendLoadTestInstances')
     },
     deleteTestInstance(id) {
-      this.socket.emit('deleteTestInstance', {id: id})
+      bus.$emit('sendDeleteTestInstance', {id: id})
     }
   }
 }
