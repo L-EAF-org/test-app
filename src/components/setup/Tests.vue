@@ -69,7 +69,9 @@ export default {
       }
     },
     deleteTest(id) {
-      bus.$emit('sendDeleteTest', {testId: id})
+      if (confirm('Delete Test?')) {
+        bus.$emit('sendDeleteTest', {testId: id})
+      }
     }
   }
 }

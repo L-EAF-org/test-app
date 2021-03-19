@@ -95,7 +95,9 @@ export default {
       return organisation.tests && organisation.tests[id] ? organisation.tests[id].value : false
     },
     deleteOrganisation(id) {
-      bus.$emit('sendDeleteOrganisation', {organisationId: id})
+      if (confirm('Delete Organisation?')) {
+        bus.$emit('sendDeleteOrganisation', {organisationId: id})
+      }
     }
   }
 }

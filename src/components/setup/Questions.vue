@@ -182,7 +182,9 @@ export default {
       }
     },
     deleteQuestion(id) {
-      bus.$emit('sendDeleteQuestion', {testId: this.currentTest, sectionId: this.currentSection, id: id})
+      if (confirm('Delete Question?')) {
+        bus.$emit('sendDeleteQuestion', {testId: this.currentTest, sectionId: this.currentSection, id: id})
+      }
     },
     moveUp(id, order) {
       bus.$emit('sendMoveQuestionUp', {testId: this.currentTest, sectionId: this.currentSection, questionId: id, order: order})
@@ -231,7 +233,9 @@ export default {
       bus.$emit('sendMoveAnswerDown', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id, order: order})
     },
     deleteAnswer(id) {
-      bus.$emit('sendDeleteAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id})
+      if (confirm('Delete Answer?')) {
+        bus.$emit('sendDeleteAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, id: id})
+      }
     },
     setTrueFalseAnswer(questionId, val) {
       bus.$emit('sendMakeTrueFalseAnswer', {testId: this.currentTest, sectionId: this.currentSection, questionId: this.currentQuestionId, val: val})

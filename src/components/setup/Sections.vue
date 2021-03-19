@@ -108,7 +108,9 @@ export default {
       bus.$emit('sendMoveSectionDown', {testId: this.currentTest, sectionId: id, order: order})
     },
     deleteSection(id) {
-      bus.$emit('sendDeleteSection', {testId: this.currentTest, sectionId: id})
+      if (confirm('Delete Section?')) {
+        bus.$emit('sendDeleteSection', {testId: this.currentTest, sectionId: id})
+      }
     }
   }
 }

@@ -92,7 +92,9 @@ export default {
       }
     },
     deleteStudent(id) {
-      bus.$emit('sendDeleteStudent', {organisationId: this.currentOrganisation, studentId: id})
+      if (confirm('Delete student?')) {
+        bus.$emit('sendDeleteStudent', {organisationId: this.currentOrganisation, studentId: id})
+      }
     }
   }
 }
