@@ -25,5 +25,3 @@ if [ -f "src/server.js" ]; then
     kill -9 $SERVER
   fi
 fi
-
-/usr/bin/php /usr/apps/monitor/src/lib/outdated.php &
