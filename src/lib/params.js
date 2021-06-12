@@ -20,9 +20,8 @@ const Params = {
       if (p && p[1] == param) {
         found = p[2]
       }
-      return found
     }
-
+    return decodeURIComponent(found)
   }
 }
 
