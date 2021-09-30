@@ -26,4 +26,5 @@ if [ -f "src/server.js" ]; then
   fi
 fi
 
-rm -r /usr/apps/$APP/node_modules/.cache/
+rm -rf node_modules/.cache
+rm -rf dist
